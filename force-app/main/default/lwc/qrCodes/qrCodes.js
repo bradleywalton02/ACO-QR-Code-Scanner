@@ -3,11 +3,13 @@ import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
+import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createAssistance from '@salesforce/apex/createAssistance.createAssistance';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
+import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
@@ -15,6 +17,10 @@ const COLUMNS1 = [
 
 const COLUMNS2 = [
     {label: 'Last Date of Holiday Food Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS3 = [
+    {label: '# Kids For North Pole', fieldName: KIDS_FIELD.fieldApiName, type: 'text'}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -32,6 +38,10 @@ export default class BarcodeScanner extends LightningElement {
     columns2 = COLUMNS2;
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
     dateHoliday;
+
+    columns3 = COLUMNS3;
+    @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
+    numberKids;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     contact;

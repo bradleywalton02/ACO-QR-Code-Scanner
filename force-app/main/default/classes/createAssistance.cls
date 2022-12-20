@@ -4,6 +4,11 @@ public with sharing class createAssistance {
         return [SELECT Date_of_Assistance__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<c4g_Client_Assistance__c> getNumberKids(Id contactId, Id recordTypeId){
+        return [SELECT of_Children_Receiving_Toys__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
+    }
+
     @AuraEnabled
     public static c4g_Client_Assistance__c createAssistance(Id contactId, Id recordTypeId, String typeOfAssistance) {
         c4g_Client_Service__c queriedService = [SELECT Id, c4g_Case__c FROM c4g_Client_Service__c WHERE c4g_Client__c = :contactId AND RecordTypeId = '012390000006CWdAAM' ORDER BY CreatedDate DESC LIMIT 1];
