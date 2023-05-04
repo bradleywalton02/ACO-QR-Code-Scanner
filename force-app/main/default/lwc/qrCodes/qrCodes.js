@@ -1,15 +1,18 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, track } from 'lwc';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
+import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createAssistance from '@salesforce/apex/createAssistance.createAssistance';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
+import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
 import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
+import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
@@ -20,7 +23,15 @@ const COLUMNS2 = [
 ];
 
 const COLUMNS3 = [
+    {label: 'Last Date of Summer Food Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS4 = [
     {label: '# Kids For North Pole', fieldName: KIDS_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS5 = [
+    {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -29,7 +40,9 @@ export default class BarcodeScanner extends LightningElement {
     scannedBarcode = '';
     foodPantryAssistanceCreated = false;
     holidayFoodAssistanceCreated = false;
+    summerFoodAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
+    schoolSuppliesAssistanceUpdated = false;
 
     columns1 = COLUMNS1;
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
@@ -40,11 +53,27 @@ export default class BarcodeScanner extends LightningElement {
     dateHoliday;
 
     columns3 = COLUMNS3;
+    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
+    dateSummer;
+
+    columns4 = COLUMNS4;
     @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
     numberKids;
 
+    columns5 = COLUMNS5;
+    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    numberBackpacks;
+
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     contact;
+
+    @track foodPantryVal = false;
+    @track northPoleVal = false;
+    @track schoolSuppliesVal = false;
+    @track poundsVal = 0;
+ 
+    selectedItemValue;
+    poundsValue;
 
     get clientid() {
         return getFieldValue(this.contact.data, CLIENTID_FIELD)
@@ -68,6 +97,7 @@ export default class BarcodeScanner extends LightningElement {
         this.foodPantryAssistanceCreated = false;
         this.holidayFoodAssistanceCreated = false;
         this.northPoleAssistanceUpdated = false;
+        this.schoolSuppliesAssistanceUpdated = false;
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -82,6 +112,14 @@ export default class BarcodeScanner extends LightningElement {
                 .then((result) => {
                     console.log(result);
                     this.scannedBarcode = result.value;
+                    if (this.northPoleVal == true) {
+                        updateNorthPoleAssistance({contactId : this.scannedBarcode});
+                        this.northPoleAssistanceUpdated = true;
+                    }
+                    if (this.schoolSuppliesVal == true) {
+                        updateSchoolSuppliesAssistance({contactId : this.scannedBarcode});
+                        this.schoolSuppliesAssistanceUpdated = true;
+                    }
                     this.dispatchEvent(
                         new ShowToastEvent({
                             title: 'Successful Scan',
@@ -147,15 +185,39 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
     handleCreateFoodPantryAssistance() {
-        createAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry'});
-        this.foodPantryAssistanceCreated = true
+        createAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry', pounds: this.poundsValue});
+        this.foodPantryAssistanceCreated = true;
     }
     handleCreateHolidayFoodAssistance() {
         createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000Q9xaAAC', typeOfAssistance: 'Holiday Food'});
-        this.holidayFoodAssistanceCreated = true
+        this.holidayFoodAssistanceCreated = true;
     }
-    handleNorthPoleCheckIn() {
-        updateNorthPoleAssistance({contactId : this.scannedBarcode});
-        this.northPoleAssistanceUpdated = true
+    handleCreateSummerFoodAssistance() {
+        createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
+        this.summerFoodAssistanceCreated = true;
+    }
+    handlePounds(event) {
+        this.poundsValue = event.detail.value;
+    }
+    handleOnselect(event) {
+        this.selectedItemValue = event.detail.value;
+ 
+        if (this.selectedItemValue == 'foodPantry'){
+            this.foodPantryVal = true;
+        }else{
+            this.foodPantryVal = false;
+        }
+       
+        if (this.selectedItemValue == 'northPole'){
+            this.northPoleVal = true;
+        }else{
+            this.northPoleVal = false;
+        }
+        
+        if (this.selectedItemValue == 'schoolSupplies'){
+            this.schoolSuppliesVal = true;
+        }else{
+            this.schoolSuppliesVal = false;
+        } 
     }
 }

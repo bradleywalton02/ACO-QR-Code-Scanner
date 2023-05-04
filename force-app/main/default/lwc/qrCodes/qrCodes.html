@@ -9,6 +9,24 @@
         QR Code in the scanner view to scan it.
     </div>
 
+    <div class="slds-p-around_medium lgc-bg">
+        <lightning-button-menu alternative-text="Show menu" variant="border-filled" onselect={handleOnselect}>
+            <lightning-menu-item value="foodPantry" label="Food Pantry"></lightning-menu-item>
+            <lightning-menu-item value="northPole" label="North Pole"></lightning-menu-item>
+            <lightning-menu-item value="schoolSupplies" label="School Supplies"></lightning-menu-item>
+        </lightning-button-menu>
+     
+        <span style=" display:inline-block; margin-left:10px;"><strong> Selected event: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{selectedItemValue}</span></span>
+    </div>
+
+    <div class="slds-col slds-size_10-of-12">
+        <template if:true={foodPantryVal}>
+            <div>
+                <lightning-input type="number" name="pounds" label="Enter Food Pantry Pounds" onchange={handlePounds} ></lightning-input>
+            </div>
+        </template>
+    </div>
+    
     <!-- After a QR Code is successfully scanned, 
          its value is displayed here: -->
     <div class="slds-var-m-vertical_large slds-var-p-vertical_medium 
@@ -17,27 +35,36 @@
         <span class="slds-text-heading_small">{clientid}<br/>{name}</span>
     </div>
 
+    <template if:true={foodPantryVal}>
+        <lightning-datatable
+        key-field="Id" data={dateFP.data} columns={columns1}>
+        </lightning-datatable>
+    </template>
+<br>
+    <template if:true={foodPantryVal}>
+        <lightning-datatable
+        key-field="Id" data={dateHoliday.data} columns={columns2}>
+        </lightning-datatable>
+    </template>
+<br>
+<template if:true={foodPantryVal}>
     <lightning-datatable
-        key-field="Id"
-        data={dateFP.data}
-        columns={columns1}
-    >
+    key-field="Id" data={dateSummer.data} columns={columns3}>
     </lightning-datatable>
-
-    <lightning-datatable
-        key-field="Id"
-        data={dateHoliday.data}
-        columns={columns2}
-    >
-    </lightning-datatable>
-
-    <lightning-datatable
-    key-field="Id"
-    data={numberKids.data}
-    columns={columns3}
-    >
-    </lightning-datatable>
-
+</template>
+<br>
+    <template if:true={northPoleVal}>
+        <lightning-datatable
+        key-field="Id" data={numberKids.data} columns={columns4}>
+        </lightning-datatable>
+    </template>
+<br>
+    <template if:true={schoolSuppliesVal}>
+        <lightning-datatable
+        key-field="Id" data={numberBackpacks.data} columns={columns5}>
+        </lightning-datatable>
+    </template>
+<br>
     <!-- The click-to-scan button;
          Disabled if QR Code Scanner isn't available -->
     <div class="slds-align_absolute-center slds-m-vertical_large">
@@ -52,62 +79,80 @@
         </lightning-button>
     </div>
     <template if:true={scannedBarcode}>
-        <template if:false={foodPantryAssistanceCreated}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:new"
-                    label="Create Food Pantry Assistance"
-                    title="Create Assistance for Contact"
-                    onclick={handleCreateFoodPantryAssistance}>
-                </lightning-button>
-            </div>
+        <template if:true={foodPantryVal}>
+            <template if:false={foodPantryAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Food Pantry Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateFoodPantryAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={foodPantryAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Food Pantry Assistance Created</span>
+                </div>
+            </template>
+            <br><br><br>
         </template>
-    </template>
-    <template if:true={foodPantryAssistanceCreated}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_large">Food Pantry Assistance Created</span>
-        </div>
-    </template>
-    <br><br><br>
-    <template if:true={scannedBarcode}>
-        <template if:false={holidayFoodAssistanceCreated}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:new"
-                    label="Create Holiday Food Assistance"
-                    title="Create Assistance for Contact"
-                    onclick={handleCreateHolidayFoodAssistance}>
-                </lightning-button>
-            </div>
+        <template if:true={foodPantryVal}>
+            <template if:false={holidayFoodAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Holiday Food Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateHolidayFoodAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={holidayFoodAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Holiday Food Assistance Created</span>
+                </div>
+            </template>
+            <br><br><br>
         </template>
-    </template>
-    <template if:true={holidayFoodAssistanceCreated}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_large">Holiday Food Assistance Created</span>
-        </div>
-    </template>
-    <br><br><br>
-    <template if:true={scannedBarcode}>
-        <template if:false={northPoleAssistanceUpdated}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:new"
-                    label="North Pole Check In"
-                    title="Update Assistance for Contact"
-                    onclick={handleNorthPoleCheckIn}>
-                </lightning-button>
-            </div>
+        <template if:true={foodPantryVal}>
+            <template if:false={summerFoodAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Summer Food Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateSummerFoodAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={summerFoodAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Summer Food Assistance Created</span>
+                </div>
+            </template>
+            <br><br><br>
         </template>
-    </template>
-    <template if:true={northPoleAssistanceUpdated}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_large">North Pole Checked In</span>
-        </div>
+        <template if:true={northPoleVal}>
+            <template if:true={northPoleAssistanceUpdated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">North Pole Checked In</span>
+                </div>
+            </template>
+        </template>
+        <br><br><br>
+        <template if:true={schoolSuppliesVal}>
+            <template if:true={schoolSuppliesAssistanceUpdated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">School Supplies Checked In</span>
+                </div>
+            </template>
+        </template>
     </template>
 </template>
