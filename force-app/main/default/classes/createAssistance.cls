@@ -10,6 +10,11 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
+    public static List<c4g_Client_Assistance__c> getReceivedBike(Id contactId, Id recordTypeId){
+        return [SELECT Date_Client_Received_Bike__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNumberBackpacks(Id contactId, Id recordTypeId){
         return [SELECT of_Backpack_with_School_Supplies_Given__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
     }
@@ -29,7 +34,7 @@ public with sharing class createAssistance {
         c4g_Client_Assistance__c queriedAssistance = [SELECT Client_Picked_Up_Toys__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = '012390000006CFBAA2' ORDER BY Date_of_Assistance__c DESC LIMIT 1];
         queriedAssistance.Client_Picked_Up_Toys__c = true;
         if (receivedBike == true) {
-            queriedAssistance.Year_Client_Received_Bike__C = Date.Today().Year();
+            queriedAssistance.Date_Client_Received_Bike__c = date.today();
         }
         update queriedAssistance;
         return queriedAssistance;

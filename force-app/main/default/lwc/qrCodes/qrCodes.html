@@ -59,9 +59,15 @@
         </lightning-datatable>
     </template>
 <br>
+    <template if:true={northPoleVal}>
+        <lightning-datatable
+        key-field="Id" data={bikeReceived.data} columns={columns5}>
+        </lightning-datatable>
+    </template>
+<br>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={numberBackpacks.data} columns={columns5}>
+        key-field="Id" data={numberBackpacks.data} columns={columns6}>
         </lightning-datatable>
     </template>
 <br>

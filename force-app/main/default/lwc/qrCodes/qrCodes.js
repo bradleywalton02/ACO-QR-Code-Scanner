@@ -4,6 +4,7 @@ import NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
+import BIKE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_Client_Received_Bike__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
@@ -12,6 +13,7 @@ import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateN
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
 import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
+import getReceivedBike from '@salesforce/apex/createAssistance.getReceivedBike';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 
 const COLUMNS1 = [
@@ -31,6 +33,10 @@ const COLUMNS4 = [
 ];
 
 const COLUMNS5 = [
+    {label: 'Last Date Client Received Bike', fieldName: BIKE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS6 = [
     {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
 ];
 
@@ -60,8 +66,12 @@ export default class BarcodeScanner extends LightningElement {
     columns4 = COLUMNS4;
     @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
     numberKids;
-
+    
     columns5 = COLUMNS5;
+    @wire(getReceivedBike, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
+    bikeReceived;
+
+    columns6 = COLUMNS6;
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     numberBackpacks;
 
@@ -200,6 +210,7 @@ export default class BarcodeScanner extends LightningElement {
     }
     handleReceivedBike() {
         updateNorthPoleAssistance({contactId : this.scannedBarcode, receivedBike : true});
+        this.receivedBike = true;
     }
     handlePounds(event) {
         this.poundsValue = event.detail.value;
