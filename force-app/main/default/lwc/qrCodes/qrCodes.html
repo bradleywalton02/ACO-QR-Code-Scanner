@@ -145,6 +145,23 @@
                     <span class="slds-text-heading_large">North Pole Checked In</span>
                 </div>
             </template>
+            <template if:false={receivedBike}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Client Received Bike"
+                        title="Update Assistance for Contact"
+                        onclick={handleReceivedBike}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={receivedBike}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Client Received Bike</span>
+                </div>
+            </template>
         </template>
         <br><br><br>
         <template if:true={schoolSuppliesVal}>

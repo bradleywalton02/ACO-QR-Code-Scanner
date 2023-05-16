@@ -43,6 +43,7 @@ export default class BarcodeScanner extends LightningElement {
     summerFoodAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
+    receivedBike = false;
 
     columns1 = COLUMNS1;
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
@@ -98,6 +99,7 @@ export default class BarcodeScanner extends LightningElement {
         this.holidayFoodAssistanceCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
+        this.receivedBike = false;
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -113,7 +115,7 @@ export default class BarcodeScanner extends LightningElement {
                     console.log(result);
                     this.scannedBarcode = result.value;
                     if (this.northPoleVal == true) {
-                        updateNorthPoleAssistance({contactId : this.scannedBarcode});
+                        updateNorthPoleAssistance({contactId : this.scannedBarcode, receivedBike : false});
                         this.northPoleAssistanceUpdated = true;
                     }
                     if (this.schoolSuppliesVal == true) {
@@ -195,6 +197,9 @@ export default class BarcodeScanner extends LightningElement {
     handleCreateSummerFoodAssistance() {
         createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
         this.summerFoodAssistanceCreated = true;
+    }
+    handleReceivedBike() {
+        updateNorthPoleAssistance({contactId : this.scannedBarcode, receivedBike : true});
     }
     handlePounds(event) {
         this.poundsValue = event.detail.value;
