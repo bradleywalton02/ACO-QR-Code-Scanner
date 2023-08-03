@@ -53,21 +53,27 @@
     </lightning-datatable>
 </template>
 <br>
+<template if:true={foodPantryVal}>
+    <lightning-datatable
+    key-field="Id" data={numberKidsSummerFood.data} columns={columns4}>
+    </lightning-datatable>
+</template>
+<br>
     <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={numberKids.data} columns={columns4}>
+        key-field="Id" data={numberKids.data} columns={columns5}>
         </lightning-datatable>
     </template>
 <br>
     <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={bikeReceived.data} columns={columns5}>
+        key-field="Id" data={childInfo.data} columns={columns6} onsave={handleSave} draft-values={saveDraftValues}>
         </lightning-datatable>
     </template>
 <br>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={numberBackpacks.data} columns={columns6}>
+        key-field="Id" data={numberBackpacks.data} columns={columns7}>
         </lightning-datatable>
     </template>
 <br>
@@ -149,23 +155,6 @@
             <template if:true={northPoleAssistanceUpdated}>
                 <div class="slds-text-align_center">
                     <span class="slds-text-heading_large">North Pole Checked In</span>
-                </div>
-            </template>
-            <template if:false={receivedBike}>
-                <div class="slds-align_absolute-center slds-m-vertical_large">
-                    <lightning-button
-                        variant="brand"
-                        class="slds-var-m-left_x-small"
-                        icon-name="action:new"
-                        label="Client Received Bike"
-                        title="Update Assistance for Contact"
-                        onclick={handleReceivedBike}>
-                    </lightning-button>
-                </div>
-            </template>
-            <template if:true={receivedBike}>
-                <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Client Received Bike</span>
                 </div>
             </template>
         </template>

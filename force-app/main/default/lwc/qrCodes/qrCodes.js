@@ -1,11 +1,14 @@
 import { LightningElement, wire, track } from 'lwc';
-import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import { getRecord, getFieldValue, updateRecord } from 'lightning/uiRecordApi';
+import { refreshApex } from '@salesforce/apex';
 import NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
-import BIKE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_Client_Received_Bike__c';
+import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
+import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
+import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createAssistance from '@salesforce/apex/createAssistance.createAssistance';
@@ -13,8 +16,9 @@ import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateN
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
 import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
-import getReceivedBike from '@salesforce/apex/createAssistance.getReceivedBike';
+import getChildInfo from '@salesforce/apex/createAssistance.getChildInfo';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
+import getKidsForSummerFood from '@salesforce/apex/createAssistance.getKidsForSummerFood';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
@@ -29,14 +33,19 @@ const COLUMNS3 = [
 ];
 
 const COLUMNS4 = [
-    {label: '# Kids For North Pole', fieldName: KIDS_FIELD.fieldApiName, type: 'text'}
+    {label: '# Kids for Summer Food', fieldName: KIDS_SUMMER_FIELD.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS5 = [
-    {label: 'Last Date Client Received Bike', fieldName: BIKE_FIELD.fieldApiName, type: 'text'}
+    {label: '# Kids For North Pole', fieldName: KIDS_FIELD.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS6 = [
+    {label: 'Name of Child', fieldName: CHILD_NAME.fieldApiName, type: 'text'},
+    {label: 'Date Child Received Bike', fieldName: BIKE_FIELD.fieldApiName, type: 'text', editable: true}
+];
+
+const COLUMNS7 = [
     {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
 ];
 
@@ -49,7 +58,8 @@ export default class BarcodeScanner extends LightningElement {
     summerFoodAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
-    receivedBike = false;
+    currentYear = new Date().getFullYear();
+    nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
 
     columns1 = COLUMNS1;
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
@@ -64,14 +74,18 @@ export default class BarcodeScanner extends LightningElement {
     dateSummer;
 
     columns4 = COLUMNS4;
+    @wire(getKidsForSummerFood, {contactId : '$scannedBarcode'})
+    numberKidsSummerFood;
+
+    columns5 = COLUMNS5;
     @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
     numberKids;
     
-    columns5 = COLUMNS5;
-    @wire(getReceivedBike, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
-    bikeReceived;
-
     columns6 = COLUMNS6;
+    @wire(getChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
+    childInfo;
+
+    columns7 = COLUMNS7;
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     numberBackpacks;
 
@@ -85,6 +99,7 @@ export default class BarcodeScanner extends LightningElement {
  
     selectedItemValue;
     poundsValue;
+    saveDraftValues = [];
 
     get clientid() {
         return getFieldValue(this.contact.data, CLIENTID_FIELD)
@@ -107,9 +122,9 @@ export default class BarcodeScanner extends LightningElement {
         this.scannedBarcode = '';
         this.foodPantryAssistanceCreated = false;
         this.holidayFoodAssistanceCreated = false;
+        this.summerFoodAssistanceCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
-        this.receivedBike = false;
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -125,7 +140,7 @@ export default class BarcodeScanner extends LightningElement {
                     console.log(result);
                     this.scannedBarcode = result.value;
                     if (this.northPoleVal == true) {
-                        updateNorthPoleAssistance({contactId : this.scannedBarcode, receivedBike : false});
+                        updateNorthPoleAssistance({contactId : this.scannedBarcode});
                         this.northPoleAssistanceUpdated = true;
                     }
                     if (this.schoolSuppliesVal == true) {
@@ -208,10 +223,6 @@ export default class BarcodeScanner extends LightningElement {
         createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
         this.summerFoodAssistanceCreated = true;
     }
-    handleReceivedBike() {
-        updateNorthPoleAssistance({contactId : this.scannedBarcode, receivedBike : true});
-        this.receivedBike = true;
-    }
     handlePounds(event) {
         this.poundsValue = event.detail.value;
     }
@@ -235,5 +246,41 @@ export default class BarcodeScanner extends LightningElement {
         }else{
             this.schoolSuppliesVal = false;
         } 
+    }
+    handleSave(event) {
+        this.saveDraftValues = event.detail.draftValues;
+        const recordInputs = this.saveDraftValues.slice().map(draft => {
+            const fields = Object.assign({}, draft);
+            return { fields };
+        });
+
+        // Updating the records using the UiRecordAPi
+        const promises = recordInputs.map(recordInput => updateRecord(recordInput));
+        Promise.all(promises).then(res => {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Records Updated Successfully!!',
+                    variant: 'success'
+                })
+            );
+            this.saveDraftValues = [];
+            return this.refresh();
+        }).catch(error => {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: 'An Error Occured!!',
+                    variant: 'error'
+                })
+            );
+        }).finally(() => {
+            this.saveDraftValues = [];
+        });
+    }
+
+    // This function is used to refresh the table once data updated
+    async refresh() {
+        await refreshApex(this.contacts);
     }
 }

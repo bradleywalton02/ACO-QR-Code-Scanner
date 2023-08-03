@@ -5,13 +5,16 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
+    public static List<Case> getKidsForSummerFood(Id contactId){return [SELECT Children_in_Your_Home_0_17__c FROM Case WHERE ContactId = :contactId ORDER BY Date_Created__c DESC LIMIT 1];}
+
+    @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNumberKids(Id contactId, Id recordTypeId){
         return [SELECT of_Children_Receiving_Toys__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<c4g_Client_Assistance__c> getReceivedBike(Id contactId, Id recordTypeId){
-        return [SELECT Date_Client_Received_Bike__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
+    public static List<Holiday__c> getChildInfo(Id contactId, String campaignName){
+        return [SELECT Child_Name__c,Date_Bike_was_Received__c FROM Holiday__c WHERE Contact__c = :contactId AND Campaign_Name__c = :campaignName ORDER BY Child_Name__c ASC];
     }
 
     @AuraEnabled(cacheable=true)
@@ -30,12 +33,9 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled
-    public static c4g_Client_Assistance__c updateNorthPoleAssistance(Id contactId, Boolean receivedBike){
+    public static c4g_Client_Assistance__c updateNorthPoleAssistance(Id contactId){
         c4g_Client_Assistance__c queriedAssistance = [SELECT Client_Picked_Up_Toys__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = '012390000006CFBAA2' ORDER BY Date_of_Assistance__c DESC LIMIT 1];
         queriedAssistance.Client_Picked_Up_Toys__c = true;
-        if (receivedBike == true) {
-            queriedAssistance.Date_Client_Received_Bike__c = date.today();
-        }
         update queriedAssistance;
         return queriedAssistance;
     }
