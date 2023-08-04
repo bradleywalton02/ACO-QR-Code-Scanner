@@ -8,6 +8,14 @@ import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_
 import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
 import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
+import GIRLS1_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Girls_1st_3rd_Grade__c';
+import GIRLS4_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Girls_4th_6th_Grade__c';
+import GIRLS7_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Girls_7th_8th_Grade__c';
+import GIRLSK_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Girls_Pre_K_Kindergarten__c';
+import BOYS1_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_1st_3rd_Grade__c';
+import BOYS4_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_4th_6th_Grade__c';
+import BOYS7_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_7th_8th_Grade__c';
+import BOYSK_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_Pre_K_Kindergarten__c';
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
@@ -49,6 +57,26 @@ const COLUMNS7 = [
     {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
 ];
 
+const COLUMNS8 = [
+    {label: '# Boys Pre-K/K', fieldName: BOYSK_FIELD.fieldApiName, type: 'text'},
+    {label: '# Girls Pre-K/K', fieldName: GIRLSK_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS9 = [
+    {label: '# Boys 1-3', fieldName: BOYS1_FIELD.fieldApiName, type: 'text'},
+    {label: '# Girls 1-3', fieldName: GIRLS1_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS10 = [
+    {label: '# Boys 4-6', fieldName: BOYS4_FIELD.fieldApiName, type: 'text'},
+    {label: '# Girls 4-6', fieldName: GIRLS4_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS11 = [
+    {label: '# Boys 7-8', fieldName: BOYS7_FIELD.fieldApiName, type: 'text'},
+    {label: '# Girls 7-8', fieldName: GIRLS7_FIELD.fieldApiName, type: 'text'}
+];
+
 export default class BarcodeScanner extends LightningElement {
     myScanner;
     scanButtonDisabled = false;
@@ -88,6 +116,22 @@ export default class BarcodeScanner extends LightningElement {
     columns7 = COLUMNS7;
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     numberBackpacks;
+
+    columns8 = COLUMNS8;
+    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    prek;
+
+    columns9 = COLUMNS9;
+    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    onethree;
+
+    columns10 = COLUMNS10;
+    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    foursix;
+
+    columns11 = COLUMNS11;
+    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    seveneight;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     contact;

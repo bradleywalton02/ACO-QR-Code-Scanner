@@ -19,7 +19,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNumberBackpacks(Id contactId, Id recordTypeId){
-        return [SELECT of_Backpack_with_School_Supplies_Given__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
+        return [SELECT of_Backpack_with_School_Supplies_Given__c,SS_Girls_1st_3rd_Grade__c,SS_Girls_4th_6th_Grade__c,SS_Girls_7th_8th_Grade__c,SS_Girls_Pre_K_Kindergarten__c,SS_Boys_1st_3rd_Grade__c,SS_Boys_4th_6th_Grade__c,SS_Boys_7th_8th_Grade__c,SS_Boys_Pre_K_Kindergarten__c FROM c4g_Client_Assistance__c WHERE c4g_Client__c = :contactId AND RecordTypeId = :recordTypeId ORDER BY Date_of_Assistance__c DESC LIMIT 1];
     }
 
     @AuraEnabled
