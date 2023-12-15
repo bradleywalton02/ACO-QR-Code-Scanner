@@ -14,7 +14,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Holiday__c> getChildInfo(Id contactId, String campaignName){
-        return [SELECT Child_Name__c,Date_Bike_was_Received__c FROM Holiday__c WHERE Contact__c = :contactId AND Campaign_Name__c = :campaignName ORDER BY Child_Name__c ASC];
+        return [SELECT Child_Name__c,Eligible_for_Bike__c,Date_Bike_was_Received__c FROM Holiday__c WHERE Contact__c = :contactId AND Campaign_Name__c = :campaignName ORDER BY Child_Name__c ASC];
     }
 
     @AuraEnabled(cacheable=true)

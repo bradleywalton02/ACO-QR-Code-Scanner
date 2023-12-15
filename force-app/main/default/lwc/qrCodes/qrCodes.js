@@ -6,6 +6,7 @@ import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
 import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
+import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
 import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
 import GIRLS1_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Girls_1st_3rd_Grade__c';
@@ -50,6 +51,7 @@ const COLUMNS5 = [
 
 const COLUMNS6 = [
     {label: 'Name of Child', fieldName: CHILD_NAME.fieldApiName, type: 'text'},
+    {label: 'Eligible for Bike', fieldName: ELIGIBLE_FIELD.fieldApiName, type: 'text'},
     {label: 'Date Child Received Bike', fieldName: BIKE_FIELD.fieldApiName, type: 'text', editable: true}
 ];
 
