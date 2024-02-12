@@ -20,7 +20,8 @@ import BOYSK_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_Pre
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
-import createAssistance from '@salesforce/apex/createAssistance.createAssistance';
+import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
+import createCaresCenterAssistance from '@salesforce/apex/createAssistance.createCaresCenterAssistance';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
@@ -79,6 +80,10 @@ const COLUMNS11 = [
     {label: '# Girls 7-8', fieldName: GIRLS7_FIELD.fieldApiName, type: 'text'}
 ];
 
+const COLUMNS12 = [
+    {label: 'Last Date of Cares Center Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+];
+
 export default class BarcodeScanner extends LightningElement {
     myScanner;
     scanButtonDisabled = false;
@@ -86,6 +91,7 @@ export default class BarcodeScanner extends LightningElement {
     foodPantryAssistanceCreated = false;
     holidayFoodAssistanceCreated = false;
     summerFoodAssistanceCreated = false;
+    caresCenterAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
     currentYear = new Date().getFullYear();
@@ -135,12 +141,17 @@ export default class BarcodeScanner extends LightningElement {
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     seveneight;
 
+    columns12 = COLUMNS12;
+    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000xUcgAAE'})
+    dateCaresCenter;
+
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     contact;
 
     @track foodPantryVal = false;
     @track northPoleVal = false;
     @track schoolSuppliesVal = false;
+    @track caresCenterVal = false;
     @track poundsVal = 0;
  
     selectedItemValue;
@@ -169,6 +180,7 @@ export default class BarcodeScanner extends LightningElement {
         this.foodPantryAssistanceCreated = false;
         this.holidayFoodAssistanceCreated = false;
         this.summerFoodAssistanceCreated = false;
+        this.caresCenterAssistancedCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
 
@@ -258,16 +270,20 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
     handleCreateFoodPantryAssistance() {
-        createAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry', pounds: this.poundsValue});
+        createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry', pounds: this.poundsValue});
         this.foodPantryAssistanceCreated = true;
     }
     handleCreateHolidayFoodAssistance() {
-        createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000Q9xaAAC', typeOfAssistance: 'Holiday Food'});
+        createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000Q9xaAAC', typeOfAssistance: 'Holiday Food'});
         this.holidayFoodAssistanceCreated = true;
     }
     handleCreateSummerFoodAssistance() {
-        createAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
+        createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
         this.summerFoodAssistanceCreated = true;
+    }
+    handleCreateCaresCenterAssistance() {
+        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5'});
+        this.caresCenterAssistanceCreated = true;
     }
     handlePounds(event) {
         this.poundsValue = event.detail.value;
@@ -291,7 +307,13 @@ export default class BarcodeScanner extends LightningElement {
             this.schoolSuppliesVal = true;
         }else{
             this.schoolSuppliesVal = false;
-        } 
+        }
+
+        if (this.selectedItemValue == 'caresCenter'){
+            this.caresCenterVal = true;
+        }else{
+            this.caresCenterVal = false;
+        }
     }
     handleSave(event) {
         this.saveDraftValues = event.detail.draftValues;

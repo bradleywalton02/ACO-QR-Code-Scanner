@@ -14,6 +14,7 @@
             <lightning-menu-item value="foodPantry" label="Food Pantry"></lightning-menu-item>
             <lightning-menu-item value="northPole" label="North Pole"></lightning-menu-item>
             <lightning-menu-item value="schoolSupplies" label="School Supplies"></lightning-menu-item>
+            <lightning-menu-item value="caresCenter" label="Cares Center"></lightning-menu-item>
         </lightning-button-menu>
      
         <span style=" display:inline-block; margin-left:10px;"><strong> Selected event: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{selectedItemValue}</span></span>
@@ -35,42 +36,58 @@
         <span class="slds-text-heading_small">{clientid}<br/>{name}</span>
     </div>
 
+    <!-- The click-to-scan button;
+        Disabled if QR Code Scanner isn't available -->
+    <div class="slds-align_absolute-center slds-m-vertical_large">
+        <lightning-button
+            variant="brand"
+            class="slds-var-m-left_x-small"
+            disabled={scanButtonDisabled}
+            icon-name="utility:scan"
+            label="Scan QR Code"
+            title="Open a camera view and look for a QR Code to scan"
+            onclick={handleBeginScanClick}>
+        </lightning-button>
+    </div>
+
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={dateFP.data} columns={columns1}>
         </lightning-datatable>
     </template>
-<br>
+
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={dateHoliday.data} columns={columns2}>
         </lightning-datatable>
     </template>
-<br>
+
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={dateSummer.data} columns={columns3}>
         </lightning-datatable>
     </template>
-<br>
+
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={numberKidsSummerFood.data} columns={columns4}>
         </lightning-datatable>
+        <br>
     </template>
-<br>
+
     <template if:true={northPoleVal}>
         <lightning-datatable
         key-field="Id" data={numberKids.data} columns={columns5}>
         </lightning-datatable>
     </template>
-<br>
+
     <template if:true={northPoleVal}>
         <lightning-datatable
         key-field="Id" data={childInfo.data} columns={columns6} onsave={handleSave} draft-values={saveDraftValues}>
         </lightning-datatable>
+        <br>
     </template>
-<br>
+
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
         key-field="Id" data={numberBackpacks.data} columns={columns7}>
@@ -95,21 +112,16 @@
         <lightning-datatable
         key-field="Id" data={seveneight.data} columns={columns11}>
         </lightning-datatable>
+        <br>
     </template>
-<br>
-    <!-- The click-to-scan button;
-         Disabled if QR Code Scanner isn't available -->
-    <div class="slds-align_absolute-center slds-m-vertical_large">
-        <lightning-button
-            variant="brand"
-            class="slds-var-m-left_x-small"
-            disabled={scanButtonDisabled}
-            icon-name="utility:scan"
-            label="Scan QR Code"
-            title="Open a camera view and look for a QR Code to scan"
-            onclick={handleBeginScanClick}>
-        </lightning-button>
-    </div>
+
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Id" data={dateCaresCenter.data} columns={columns12}>
+        </lightning-datatable>
+        <br>
+    </template>
+
     <template if:true={scannedBarcode}>
         <template if:true={foodPantryVal}>
             <template if:false={foodPantryAssistanceCreated}>
@@ -177,14 +189,35 @@
                     <span class="slds-text-heading_large">North Pole Checked In</span>
                 </div>
             </template>
+            <br><br><br>
         </template>
-        <br><br><br>
         <template if:true={schoolSuppliesVal}>
             <template if:true={schoolSuppliesAssistanceUpdated}>
                 <div class="slds-text-align_center">
                     <span class="slds-text-heading_large">School Supplies Checked In</span>
                 </div>
             </template>
+            <br><br><br>
+        </template>
+        <template if:true={caresCenterVal}>
+            <template if:false={caresCenterAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Cares Center Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateCaresCenterAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={caresCenterAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Cares Center Assistance Created</span>
+                </div>
+            </template>
+            <br><br><br>
         </template>
     </template>
 </template>
