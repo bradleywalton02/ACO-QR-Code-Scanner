@@ -142,7 +142,7 @@ export default class BarcodeScanner extends LightningElement {
     seveneight;
 
     columns12 = COLUMNS12;
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000xUcgAAE'})
+    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012Ou000000GYAbIAO'})
     dateCaresCenter;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
@@ -282,7 +282,7 @@ export default class BarcodeScanner extends LightningElement {
         this.summerFoodAssistanceCreated = true;
     }
     handleCreateCaresCenterAssistance() {
-        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5'});
+        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Ou000000GYAbIAO'});
         this.caresCenterAssistanceCreated = true;
     }
     handlePounds(event) {
