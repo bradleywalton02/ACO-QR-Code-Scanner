@@ -18,10 +18,14 @@ import BOYS4_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_4th
 import BOYS7_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_7th_8th_Grade__c';
 import BOYSK_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.SS_Boys_Pre_K_Kindergarten__c';
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
+import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
+import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
+import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
 import createCaresCenterAssistance from '@salesforce/apex/createAssistance.createCaresCenterAssistance';
+import createCaresCenterItem from '@salesforce/apex/createAssistance.createCaresCenterItem';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
@@ -29,6 +33,11 @@ import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
 import getChildInfo from '@salesforce/apex/createAssistance.getChildInfo';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 import getKidsForSummerFood from '@salesforce/apex/createAssistance.getKidsForSummerFood';
+import getLaundryDetergent from '@salesforce/apex/createAssistance.getLaundryDetergent';
+import getPaperTowel from '@salesforce/apex/createAssistance.getPaperTowel';
+import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
+import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
+import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
@@ -81,7 +90,26 @@ const COLUMNS11 = [
 ];
 
 const COLUMNS12 = [
-    {label: 'Last Date of Cares Center Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+    {label: 'Last Cares Center Visit', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS13 = [
+    {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS14 = [
+    {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS15 = [
+    {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS16 = [
+    {label: 'Cares Card Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -91,9 +119,10 @@ export default class BarcodeScanner extends LightningElement {
     foodPantryAssistanceCreated = false;
     holidayFoodAssistanceCreated = false;
     summerFoodAssistanceCreated = false;
-    caresCenterAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
+    caresCenterCheckedIn = false;
+    caresCenterCheckedOut = false;
     currentYear = new Date().getFullYear();
     nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
 
@@ -142,8 +171,63 @@ export default class BarcodeScanner extends LightningElement {
     seveneight;
 
     columns12 = COLUMNS12;
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012Ou000000GYAbIAO'})
+    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
     dateCaresCenter;
+
+    columns13 = COLUMNS13;
+    @wire(getLaundryDetergent, {contactId : '$scannedBarcode'})
+    laundryDetergent({error, data}) {
+        if (data) {
+            // Check if the data array is empty
+            if (data.length == 0) {
+                // If the data array is empty, assign a placeholder row
+                this.laundryDetergentData = [{Name: 'Laundry Detergent'}];
+            } else {
+                // If data is available, assign it to the component property
+                this.laundryDetergentData = data;
+            }
+        } else if (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    columns14 = COLUMNS14;
+    @wire(getPaperTowel, {contactId : '$scannedBarcode'})
+    paperTowel({error, data}) {
+        if (data) {
+            // Check if the data array is empty
+            if (data.length == 0) {
+                // If the data array is empty, assign a placeholder row
+                this.paperTowelData = [{Name: 'Paper Towel'}];
+            } else {
+                // If data is available, assign it to the component property
+                this.paperTowelData = data;
+            }
+        } else if (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    columns15 = COLUMNS15;
+    @wire(getToiletPaper, {contactId : '$scannedBarcode'})
+    toiletPaper({error, data}) {
+        if (data) {
+            // Check if the data array is empty
+            if (data.length == 0) {
+                // If the data array is empty, assign a placeholder row
+                this.toiletPaperData = [{Name: 'Toilet Paper'}];
+            } else {
+                // If data is available, assign it to the component property
+                this.toiletPaperData = data;
+            }
+        } else if (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    columns16 = COLUMNS16;
+    @wire(getCaresCardBalance, {contactId : '$scannedBarcode'})
+    caresCardBalance;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     contact;
@@ -153,6 +237,13 @@ export default class BarcodeScanner extends LightningElement {
     @track schoolSuppliesVal = false;
     @track caresCenterVal = false;
     @track poundsVal = 0;
+    @track selectedRows = [];
+    @track childInfo;
+    @track caresCardBalance;
+    @track totalAmount = 0;
+    @track laundryDetergentData = [];
+    @track paperTowelData = [];
+    @track toiletPaperData = [];
  
     selectedItemValue;
     poundsValue;
@@ -180,9 +271,11 @@ export default class BarcodeScanner extends LightningElement {
         this.foodPantryAssistanceCreated = false;
         this.holidayFoodAssistanceCreated = false;
         this.summerFoodAssistanceCreated = false;
-        this.caresCenterAssistancedCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
+        this.caresCenterCheckedIn = false;
+        this.caresCenterCheckedOut = false;
+        this.totalAmount = 0;
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -269,52 +362,107 @@ export default class BarcodeScanner extends LightningElement {
             );
         }
     }
+
     handleCreateFoodPantryAssistance() {
         createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry', pounds: this.poundsValue});
         this.foodPantryAssistanceCreated = true;
     }
+
     handleCreateHolidayFoodAssistance() {
         createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000Q9xaAAC', typeOfAssistance: 'Holiday Food'});
         this.holidayFoodAssistanceCreated = true;
     }
+
     handleCreateSummerFoodAssistance() {
         createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '0124z000000JQpFAAW', typeOfAssistance: 'Summer Food'});
         this.summerFoodAssistanceCreated = true;
     }
-    handleCreateCaresCenterAssistance() {
-        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Ou000000GYAbIAO'});
-        this.caresCenterAssistanceCreated = true;
-    }
+
     handlePounds(event) {
         this.poundsValue = event.detail.value;
     }
+
+    handleRowSelection(event) {
+        const newlySelectedRows = event.detail.selectedRows;
+        this.selectedRows = [...this.selectedRows, ...newlySelectedRows];
+    }
+
+    handleCaresCenterCheckIn() {
+        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
+        this.caresCenterCheckedIn = true;
+    }
+
+    handleCaresCenterCheckOut() {
+        this.selectedRows.forEach(row => {
+            if (row.Name == 'Laundry Detergent') {
+                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Laundry Detergent'});
+            }
+
+            else if (row.Name == 'Paper Towel') {
+                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Paper Towel'});
+            }
+
+            else if (row.Name == 'Toilet Paper') {
+                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Toilet Paper'});
+            }
+        });
+        updateCaresCardBalance({contactId : this.scannedBarcode, amount: this.totalAmount})
+            .then(res => {
+                this.refresh();
+            })
+            .catch(error => {
+                console.error('Error updating Cares Card balance: ', error);
+            });
+        this.caresCenterCheckedOut = true;
+    }
+
+    handleAmountChange(event) {
+        if (!isNaN(parseFloat(event.target.value))) {
+            this.totalAmount += parseFloat(event.target.value);
+        }
+
+        const inputField = this.template.querySelector('lightning-input[data-id="priceInput"]');
+        if (inputField) {
+            inputField.value = ''; // Clear the value
+        }
+    }
+
+    handleResetTotalAmount() {
+        this.totalAmount = 0;
+    }
+
+    get formattedTotalAmount() {
+        return this.totalAmount.toFixed(2);
+    }
+
     handleOnselect(event) {
         this.selectedItemValue = event.detail.value;
  
-        if (this.selectedItemValue == 'foodPantry'){
+        if (this.selectedItemValue == 'foodPantry') {
             this.foodPantryVal = true;
-        }else{
+        } else {
             this.foodPantryVal = false;
         }
        
-        if (this.selectedItemValue == 'northPole'){
+        if (this.selectedItemValue == 'northPole') {
             this.northPoleVal = true;
-        }else{
+        } else {
             this.northPoleVal = false;
         }
         
-        if (this.selectedItemValue == 'schoolSupplies'){
+        if (this.selectedItemValue == 'schoolSupplies') {
             this.schoolSuppliesVal = true;
-        }else{
+        } else {
             this.schoolSuppliesVal = false;
         }
 
-        if (this.selectedItemValue == 'caresCenter'){
+        if (this.selectedItemValue == 'caresCenter') {
             this.caresCenterVal = true;
-        }else{
+        } else {
             this.caresCenterVal = false;
         }
     }
+
     handleSave(event) {
         this.saveDraftValues = event.detail.draftValues;
         const recordInputs = this.saveDraftValues.slice().map(draft => {
@@ -349,6 +497,7 @@ export default class BarcodeScanner extends LightningElement {
 
     // This function is used to refresh the table once data updated
     async refresh() {
-        await refreshApex(this.contacts);
+        await refreshApex(this.childInfo);
+        await refreshApex(this.caresCardBalance);
     }
 }

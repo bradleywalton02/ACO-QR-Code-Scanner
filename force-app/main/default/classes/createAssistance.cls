@@ -48,6 +48,46 @@ public with sharing class createAssistance {
                 DESC LIMIT 1];
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<Cares_Center_Item__c> getLaundryDetergent(Id contactId) {
+        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+                FROM Cares_Center_Item__c
+                WHERE Contact__c = :contactId
+                AND Name = 'Laundry Detergent'
+                ORDER BY Date_Item_was_Received__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Cares_Center_Item__c> getPaperTowel(Id contactId) {
+        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+                FROM Cares_Center_Item__c
+                WHERE Contact__c = :contactId
+                AND Name = 'Paper Towel'
+                ORDER BY Date_Item_was_Received__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Cares_Center_Item__c> getToiletPaper(Id contactId) {
+        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+                FROM Cares_Center_Item__c
+                WHERE Contact__c = :contactId
+                AND Name = 'Toilet Paper'
+                ORDER BY Date_Item_was_Received__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<c4g_Client_Assistance__c> getCaresCardBalance(Id contactId) {
+        return [SELECT ACO_Cares_Card__c
+                FROM c4g_Client_Assistance__c
+                WHERE c4g_Client__c = :contactId
+                AND RecordTypeId = '0124z000000xUcgAAE'
+                ORDER BY Date_of_Assistance__c
+                DESC LIMIT 1];
+    }
+
     @AuraEnabled
     public static c4g_Client_Assistance__c createFoodAssistance(Id contactId, Id recordTypeId, String typeOfAssistance, Integer pounds) {
         c4g_Client_Service__c queriedService = [SELECT Id, c4g_Case__c
@@ -97,6 +137,27 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled
+    public static Cares_Center_Item__c createCaresCenterItem(Id contactId, String itemName) {
+        c4g_Client_Assistance__c queriedAssistance = [SELECT Id
+                                                      FROM c4g_Client_Assistance__c
+                                                      WHERE c4g_Client__c = :contactId
+                                                      AND RecordTypeId = '012Nt000000plo5IAA'
+                                                      ORDER BY Date_of_Assistance__c
+                                                      DESC LIMIT 1];
+
+        Id assistanceId = queriedAssistance.Id;
+        
+        Cares_Center_Item__c caresCenterItem = new Cares_Center_Item__c(
+            Name = itemName,
+            Date_Item_was_Received__c = date.today(),
+            Assistance__c = assistanceId,
+            Contact__c = contactId);
+
+        insert caresCenterItem;
+        return caresCenterItem;
+    }
+
+    @AuraEnabled
     public static c4g_Client_Assistance__c updateNorthPoleAssistance(Id contactId) {
         c4g_Client_Assistance__c queriedAssistance = [SELECT Client_Picked_Up_Toys__c
                                                       FROM c4g_Client_Assistance__c
@@ -121,6 +182,22 @@ public with sharing class createAssistance {
                                                       DESC LIMIT 1];
 
         queriedAssistance.Client_Picked_Up_School_Supplies__c = true;
+        
+        update queriedAssistance;
+        return queriedAssistance;
+    }
+
+
+    @AuraEnabled
+    public static c4g_Client_Assistance__c updateCaresCardBalance(Id contactId, Decimal amount) {
+        c4g_Client_Assistance__c queriedAssistance = [SELECT ACO_Cares_Card__c
+                                                      FROM c4g_Client_Assistance__c
+                                                      WHERE c4g_Client__c = :contactId
+                                                      AND RecordTypeId = '0124z000000xUcgAAE'
+                                                      ORDER BY Date_of_Assistance__c
+                                                      DESC LIMIT 1];
+
+        queriedAssistance.ACO_Cares_Card__c -= amount;
         
         update queriedAssistance;
         return queriedAssistance;

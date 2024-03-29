@@ -117,8 +117,44 @@
 
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={dateCaresCenter.data} columns={columns12}>
+        key-field="Id" data={dateCaresCenter.data} columns={columns12} hide-checkbox-column>
         </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Name" data={laundryDetergentData} columns={columns13} onrowselection={handleRowSelection}>
+        </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Name" data={paperTowelData} columns={columns14} onrowselection={handleRowSelection}>
+        </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Name" data={toiletPaperData} columns={columns15} onrowselection={handleRowSelection}>
+        </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Id" data={caresCardBalance.data} columns={columns16} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
+        </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-input
+        type="number" step="any" label="Enter Price" onblur={handleAmountChange} data-id="priceInput" hide-checkbox-column>
+        </lightning-input>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <div class="slds-text-align_center">
+            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
+        </div>
         <br>
     </template>
 
@@ -200,23 +236,56 @@
             <br><br><br>
         </template>
         <template if:true={caresCenterVal}>
-            <template if:false={caresCenterAssistanceCreated}>
+            <template if:false={caresCenterCheckedIn}>
                 <div class="slds-align_absolute-center slds-m-vertical_large">
                     <lightning-button
                         variant="brand"
                         class="slds-var-m-left_x-small"
                         icon-name="action:new"
-                        label="Create Cares Center Assistance"
+                        label="Check In Client"
                         title="Create Assistance for Contact"
-                        onclick={handleCreateCaresCenterAssistance}>
+                        onclick={handleCaresCenterCheckIn}>
                     </lightning-button>
                 </div>
             </template>
-            <template if:true={caresCenterAssistanceCreated}>
+            <template if:true={caresCenterCheckedIn}>
                 <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Cares Center Assistance Created</span>
+                    <span class="slds-text-heading_large">Client Checked In</span>
                 </div>
             </template>
+            <br><br><br>
+        </template>
+        <template if:true={caresCenterVal}>
+            <template if:false={caresCenterCheckedOut}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Check Out Client"
+                        title="Create Cares Center Item for Assistance"
+                        onclick={handleCaresCenterCheckOut}>
+                    </lightning-button>
+                </div>
+            </template>
+            <template if:true={caresCenterCheckedOut}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Client Checked Out</span>
+                </div>
+            </template>
+            <br><br><br>
+        </template>
+        <template if:true={caresCenterVal}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:refresh"
+                        label="Reset Price Accumulator"
+                        title="Set Total Amount to $0"
+                        onclick={handleResetTotalAmount}>
+                    </lightning-button>
+                </div>
             <br><br><br>
         </template>
     </template>
