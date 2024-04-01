@@ -146,15 +146,21 @@
         <br>
     </template>
     <template if:true={caresCenterVal}>
+        <div class="slds-text-align_center">
+            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
+        </div>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
         <lightning-input
-        type="number" step="any" label="Enter Price" onblur={handleAmountChange} data-id="priceInput" hide-checkbox-column>
+        type="number" step="any" label="Enter Price to Add" onblur={handleAddToTotal} data-id="priceInputAdd" hide-checkbox-column>
         </lightning-input>
         <br>
     </template>
     <template if:true={caresCenterVal}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
-        </div>
+        <lightning-input
+        type="number" step="any" label="Enter Price to Subtract" onblur={handleSubtractFromTotal} data-id="priceInputSubtract" hide-checkbox-column>
+        </lightning-input>
         <br>
     </template>
 
@@ -281,7 +287,7 @@
                         variant="brand"
                         class="slds-var-m-left_x-small"
                         icon-name="action:refresh"
-                        label="Reset Price Accumulator"
+                        label="Reset Total Cost"
                         title="Set Total Amount to $0"
                         onclick={handleResetTotalAmount}>
                     </lightning-button>

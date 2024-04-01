@@ -416,12 +416,23 @@ export default class BarcodeScanner extends LightningElement {
         this.caresCenterCheckedOut = true;
     }
 
-    handleAmountChange(event) {
+    handleAddToTotal(event) {
         if (!isNaN(parseFloat(event.target.value))) {
             this.totalAmount += parseFloat(event.target.value);
         }
 
-        const inputField = this.template.querySelector('lightning-input[data-id="priceInput"]');
+        const inputField = this.template.querySelector('lightning-input[data-id="priceInputAdd"]');
+        if (inputField) {
+            inputField.value = ''; // Clear the value
+        }
+    }
+
+    handleSubtractFromTotal(event) {
+        if (!isNaN(parseFloat(event.target.value))) {
+            this.totalAmount -= parseFloat(event.target.value);
+        }
+
+        const inputField = this.template.querySelector('lightning-input[data-id="priceInputSubtract"]');
         if (inputField) {
             inputField.value = ''; // Clear the value
         }
