@@ -275,6 +275,9 @@ export default class BarcodeScanner extends LightningElement {
         this.schoolSuppliesAssistanceUpdated = false;
         this.caresCenterCheckedIn = false;
         this.caresCenterCheckedOut = false;
+        this.laundryDetergentData = [];
+        this.paperTowelData = [];
+        this.toiletPaperData = [];
         this.totalAmount = 0;
 
         // Make sure BarcodeScanner is available before trying to use it
