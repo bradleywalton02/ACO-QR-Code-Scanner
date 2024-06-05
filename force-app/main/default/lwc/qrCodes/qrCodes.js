@@ -38,6 +38,7 @@ import getPaperTowel from '@salesforce/apex/createAssistance.getPaperTowel';
 import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
 import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
 import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
+import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCenterDates';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
@@ -90,7 +91,7 @@ const COLUMNS11 = [
 ];
 
 const COLUMNS12 = [
-    {label: 'Last Cares Center Visit', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+    {label: 'Cares Center Visits This Month', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS13 = [
@@ -109,7 +110,7 @@ const COLUMNS15 = [
 ];
 
 const COLUMNS16 = [
-    {label: 'Cares Card Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
+    {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -121,7 +122,6 @@ export default class BarcodeScanner extends LightningElement {
     summerFoodAssistanceCreated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
-    caresCenterCheckedIn = false;
     caresCenterCheckedOut = false;
     currentYear = new Date().getFullYear();
     nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
@@ -171,7 +171,7 @@ export default class BarcodeScanner extends LightningElement {
     seveneight;
 
     columns12 = COLUMNS12;
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
+    @wire(getCaresCenterDates, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
     dateCaresCenter;
 
     columns13 = COLUMNS13;
@@ -230,7 +230,15 @@ export default class BarcodeScanner extends LightningElement {
     caresCardBalance;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
-    contact;
+    wiredContact({error, data}) {
+        if (data) {
+            this.contact = data;
+            this.clientid = getFieldValue(data, CLIENTID_FIELD);
+            this.name = getFieldValue(data, NAME_FIELD);
+        } else if (error) {
+            console.error('Error retrieving contact data: ', error);
+        }
+    }
 
     @track foodPantryVal = false;
     @track northPoleVal = false;
@@ -244,19 +252,15 @@ export default class BarcodeScanner extends LightningElement {
     @track laundryDetergentData = [];
     @track paperTowelData = [];
     @track toiletPaperData = [];
+    @track scannedContacts = [];
+    @track contact;
+    @track clientid;
+    @track name;
  
     selectedItemValue;
     poundsValue;
     saveDraftValues = [];
-
-    get clientid() {
-        return getFieldValue(this.contact.data, CLIENTID_FIELD)
-    }
-
-    get name() {
-        return getFieldValue(this.contact.data, NAME_FIELD);
-    }
-
+    
     // When component is initialized, detect whether to enable Scan button
     connectedCallback() {
         this.myScanner = getBarcodeScanner();
@@ -273,11 +277,11 @@ export default class BarcodeScanner extends LightningElement {
         this.summerFoodAssistanceCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
-        this.caresCenterCheckedIn = false;
         this.caresCenterCheckedOut = false;
         this.laundryDetergentData = [];
         this.paperTowelData = [];
         this.toiletPaperData = [];
+        this.selectedRows = [];
         this.totalAmount = 0;
 
         // Make sure BarcodeScanner is available before trying to use it
@@ -293,13 +297,19 @@ export default class BarcodeScanner extends LightningElement {
                 .then((result) => {
                     console.log(result);
                     this.scannedBarcode = result.value;
-                    if (this.northPoleVal == true) {
+                    if (this.northPoleVal) {
                         updateNorthPoleAssistance({contactId : this.scannedBarcode});
                         this.northPoleAssistanceUpdated = true;
                     }
-                    if (this.schoolSuppliesVal == true) {
+                    if (this.schoolSuppliesVal) {
                         updateSchoolSuppliesAssistance({contactId : this.scannedBarcode});
                         this.schoolSuppliesAssistanceUpdated = true;
+                    }
+                    if (this.caresCenterVal) {
+                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
+                        setTimeout(() => {
+                            this.scannedContacts.push({id: this.scannedBarcode, name: this.name});
+                        }, 2000);
                     }
                     this.dispatchEvent(
                         new ShowToastEvent({
@@ -390,11 +400,6 @@ export default class BarcodeScanner extends LightningElement {
         this.selectedRows = [...this.selectedRows, ...newlySelectedRows];
     }
 
-    handleCaresCenterCheckIn() {
-        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
-        this.caresCenterCheckedIn = true;
-    }
-
     handleCaresCenterCheckOut() {
         this.selectedRows.forEach(row => {
             if (row.Name == 'Laundry Detergent') {
@@ -414,9 +419,53 @@ export default class BarcodeScanner extends LightningElement {
                 this.refresh();
             })
             .catch(error => {
-                console.error('Error updating Cares Card balance: ', error);
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error Updating Balance',
+                        message: 'Cares Account balance could not be updated.',
+                        variant: 'error'
+                    })
+                );
             });
+        this.scannedContacts = this.scannedContacts.filter(contact => contact.id != this.scannedBarcode);
         this.caresCenterCheckedOut = true;
+    }
+    
+    handleSwitchContact(event) {
+        const contactId = event.currentTarget.dataset.id;
+        const contact = this.scannedContacts.find(item => item.id == contactId);
+
+        if (contact) {
+            this.scannedBarcode = '';
+            this.caresCenterCheckedOut = false;
+            this.laundryDetergentData = [];
+            this.paperTowelData = [];
+            this.toiletPaperData = [];
+            this.selectedRows = [];
+            this.totalAmount = 0;
+            setTimeout(() => {
+                this.scannedBarcode = contact.id;
+                this.name = contact.name;
+            }, 100);
+        }
+    }
+
+    handleKeyUpAdd(event) {
+        if (event.keyCode == 13) { // 13 is the key code for Enter
+            // Call the original blur handler
+            this.handleAddToTotal(event);
+            // Blur the input element to hide the keyboard
+            event.target.blur();
+        }
+    }
+
+    handleKeyUpSubtract(event) {
+        if (event.keyCode == 13) { // 13 is the key code for Enter
+            // Call the original blur handler
+            this.handleSubtractFromTotal(event);
+            // Blur the input element to hide the keyboard
+            event.target.blur();
+        }
     }
 
     handleAddToTotal(event) {

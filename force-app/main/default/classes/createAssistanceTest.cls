@@ -97,6 +97,25 @@ private class createAssistanceTest {
     }
 
     @isTest
+    static void testGetCaresCenterDates() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        Test.startTest();
+        // Call the method to be tested
+        List<c4g_Client_Assistance__c> result = createAssistance.getCaresCenterDates(testContact.Id, '012Nt000000plo5IAA');
+        Test.stopTest();
+
+        // Perform assertions
+        System.assertNotEquals(null, result, 'Result should not be null');
+        System.assertEquals(0, result.size(), 'No records should be returned initially');
+
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
     static void testGetLaundryDetergent() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
