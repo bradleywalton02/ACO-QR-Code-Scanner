@@ -57,22 +57,28 @@
     </template>
 
     <template if:true={foodPantryVal}>
-        <lightning-datatable
-        key-field="Id" data={dateHoliday.data} columns={columns2}>
-        </lightning-datatable>
+        <template if:true={holidayActive}>
+            <lightning-datatable
+            key-field="Id" data={dateHoliday.data} columns={columns2}>
+            </lightning-datatable>
+        </template>
     </template>
 
     <template if:true={foodPantryVal}>
-        <lightning-datatable
-        key-field="Id" data={dateSummer.data} columns={columns3}>
-        </lightning-datatable>
+        <template if:true={kidsSummerActive}>
+            <lightning-datatable
+            key-field="Id" data={dateSummer.data} columns={columns3}>
+            </lightning-datatable>
+        </template>
     </template>
 
     <template if:true={foodPantryVal}>
-        <lightning-datatable
-        key-field="Id" data={numberKidsSummerFood.data} columns={columns4}>
-        </lightning-datatable>
-        <br>
+        <template if:true={kidsSummerActive}>
+            <lightning-datatable
+            key-field="Id" data={numberKidsSummerFood.data} columns={columns4}>
+            </lightning-datatable>
+            <br>
+        </template>
     </template>
 
     <template if:true={northPoleVal}>
@@ -90,58 +96,65 @@
 
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={numberBackpacks.data} columns={columns7}>
+        key-field="Id" data={dateSchoolSupplies.data} columns={columns7} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={prek.data} columns={columns8}>
+        key-field="Id" data={numberBackpacks.data} columns={columns8} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={onethree.data} columns={columns9}>
+        key-field="Id" data={schoolSuppliesBalance.data} columns={columns9} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
-        <lightning-datatable
-        key-field="Id" data={foursix.data} columns={columns10}>
-        </lightning-datatable>
+        <div class="slds-text-align_center">
+            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
+        </div>
+        <br>
     </template>
     <template if:true={schoolSuppliesVal}>
-        <lightning-datatable
-        key-field="Id" data={seveneight.data} columns={columns11}>
-        </lightning-datatable>
+        <lightning-input
+        type="number" step="any" label="Add to Total" onkeyup={handleKeyUpAdd} onblur={handleAddToTotal} data-id="priceInputAdd" hide-checkbox-column>
+        </lightning-input>
+        <br>
+    </template>
+    <template if:true={schoolSuppliesVal}>
+        <lightning-input
+        type="number" step="any" label="Subtract from Total" onkeyup={handleKeyUpSubtract} onblur={handleSubtractFromTotal} data-id="priceInputSubtract" hide-checkbox-column>
+        </lightning-input>
         <br>
     </template>
 
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={dateCaresCenter.data} columns={columns12} hide-checkbox-column>
+        key-field="Id" data={dateCaresCenter.data} columns={columns10} hide-checkbox-column>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Name" data={laundryDetergentData} columns={columns13} onrowselection={handleRowSelection}>
+        key-field="Name" data={laundryDetergentData} columns={columns11} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Name" data={paperTowelData} columns={columns14} onrowselection={handleRowSelection}>
+        key-field="Name" data={paperTowelData} columns={columns12} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Name" data={toiletPaperData} columns={columns15} onrowselection={handleRowSelection}>
+        key-field="Name" data={toiletPaperData} columns={columns13} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={caresCardBalance.data} columns={columns16} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
+        key-field="Id" data={caresCardBalance.data} columns={columns14} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
         </lightning-datatable>
         <br>
     </template>
@@ -186,44 +199,48 @@
             <br><br><br>
         </template>
         <template if:true={foodPantryVal}>
-            <template if:false={holidayFoodAssistanceCreated}>
-                <div class="slds-align_absolute-center slds-m-vertical_large">
-                    <lightning-button
-                        variant="brand"
-                        class="slds-var-m-left_x-small"
-                        icon-name="action:new"
-                        label="Create Holiday Food Assistance"
-                        title="Create Assistance for Contact"
-                        onclick={handleCreateHolidayFoodAssistance}>
-                    </lightning-button>
-                </div>
+            <template if:true={holidayActive}>
+                <template if:false={holidayFoodAssistanceCreated}>
+                    <div class="slds-align_absolute-center slds-m-vertical_large">
+                        <lightning-button
+                            variant="brand"
+                            class="slds-var-m-left_x-small"
+                            icon-name="action:new"
+                            label="Create Holiday Food Assistance"
+                            title="Create Assistance for Contact"
+                            onclick={handleCreateHolidayFoodAssistance}>
+                        </lightning-button>
+                    </div>
+                </template>
+                <template if:true={holidayFoodAssistanceCreated}>
+                    <div class="slds-text-align_center">
+                        <span class="slds-text-heading_large">Holiday Food Assistance Created</span>
+                    </div>
+                </template>
+                <br><br><br>
             </template>
-            <template if:true={holidayFoodAssistanceCreated}>
-                <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Holiday Food Assistance Created</span>
-                </div>
-            </template>
-            <br><br><br>
         </template>
         <template if:true={foodPantryVal}>
-            <template if:false={summerFoodAssistanceCreated}>
-                <div class="slds-align_absolute-center slds-m-vertical_large">
-                    <lightning-button
-                        variant="brand"
-                        class="slds-var-m-left_x-small"
-                        icon-name="action:new"
-                        label="Create Summer Food Assistance"
-                        title="Create Assistance for Contact"
-                        onclick={handleCreateSummerFoodAssistance}>
-                    </lightning-button>
-                </div>
+            <template if:true={kidsSummerActive}>
+                <template if:false={summerFoodAssistanceCreated}>
+                    <div class="slds-align_absolute-center slds-m-vertical_large">
+                        <lightning-button
+                            variant="brand"
+                            class="slds-var-m-left_x-small"
+                            icon-name="action:new"
+                            label="Create Summer Food Assistance"
+                            title="Create Assistance for Contact"
+                            onclick={handleCreateSummerFoodAssistance}>
+                        </lightning-button>
+                    </div>
+                </template>
+                <template if:true={summerFoodAssistanceCreated}>
+                    <div class="slds-text-align_center">
+                        <span class="slds-text-heading_large">Summer Food Assistance Created</span>
+                    </div>
+                </template>
+                <br><br><br>
             </template>
-            <template if:true={summerFoodAssistanceCreated}>
-                <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Summer Food Assistance Created</span>
-                </div>
-            </template>
-            <br><br><br>
         </template>
         <template if:true={northPoleVal}>
             <template if:true={northPoleAssistanceUpdated}>
@@ -234,12 +251,37 @@
             <br><br><br>
         </template>
         <template if:true={schoolSuppliesVal}>
+            <template if:false={schoolSuppliesAssistanceUpdated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Complete Transaction"
+                        title="Update School Supplies Assistance"
+                        onclick={handleSchoolSuppliesUpdate}>
+                    </lightning-button>
+                </div>
+            </template>
             <template if:true={schoolSuppliesAssistanceUpdated}>
                 <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">School Supplies Checked In</span>
+                    <span class="slds-text-heading_large">Transaction Completed</span>
                 </div>
             </template>
             <br><br><br>
+        </template>
+        <template if:true={schoolSuppliesVal}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:refresh"
+                    label="Reset Total Cost"
+                    title="Set Total Amount to $0"
+                    onclick={handleResetTotalAmount}>
+                </lightning-button>
+            </div>
+        <br><br><br>
         </template>
         <template if:true={caresCenterVal}>
             <template if:false={caresCenterCheckedOut}>

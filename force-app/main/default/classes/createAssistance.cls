@@ -40,7 +40,17 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNumberBackpacks(Id contactId, Id recordTypeId) {
-        return [SELECT of_Backpack_with_School_Supplies_Given__c,SS_Girls_1st_3rd_Grade__c,SS_Girls_4th_6th_Grade__c,SS_Girls_7th_8th_Grade__c,SS_Girls_Pre_K_Kindergarten__c,SS_Boys_1st_3rd_Grade__c,SS_Boys_4th_6th_Grade__c,SS_Boys_7th_8th_Grade__c,SS_Boys_Pre_K_Kindergarten__c
+        return [SELECT of_Backpack_with_School_Supplies_Given__c
+                FROM c4g_Client_Assistance__c
+                WHERE c4g_Client__c = :contactId
+                AND RecordTypeId = :recordTypeId
+                ORDER BY Date_of_Assistance__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<c4g_Client_Assistance__c> getSpecialEventBalance(Id contactId, Id recordTypeId) {
+        return [SELECT Special_Event_Balance__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId
                 AND RecordTypeId = :recordTypeId
@@ -227,6 +237,20 @@ public with sharing class createAssistance {
         return queriedAssistance;
     }
 
+    @AuraEnabled
+    public static c4g_Client_Assistance__c updateSpecialEventBalance(Id contactId, Id recordTypeId, Decimal amount) {
+        c4g_Client_Assistance__c queriedAssistance = [SELECT Special_Event_Balance__c
+                                                      FROM c4g_Client_Assistance__c
+                                                      WHERE c4g_Client__c = :contactId
+                                                      AND RecordTypeId = :recordTypeId
+                                                      ORDER BY Date_of_Assistance__c
+                                                      DESC LIMIT 1];
+
+        queriedAssistance.Special_Event_Balance__c -= amount;
+
+        update queriedAssistance;
+        return queriedAssistance;
+    }
 
     @AuraEnabled
     public static c4g_Client_Assistance__c updateCaresCardBalance(Id contactId, Decimal amount) {

@@ -97,6 +97,27 @@ private class createAssistanceTest {
     }
 
     @isTest
+    static void testGetSpecialEventBalance() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            List<c4g_Client_Assistance__c> result = createAssistance.getSpecialEventBalance(testContact.Id, '012390000006CF1AAM');
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
     static void testGetCaresCenterDates() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
@@ -294,6 +315,28 @@ private class createAssistanceTest {
         // Call the method to be tested within a try-catch block
         try {
             c4g_Client_Assistance__c assistance = createAssistance.updateSchoolSuppliesAssistance(testContact.Id);
+            
+            // Perform assertions
+            System.assertNotEquals(null, assistance, 'Assistance object should not be null');
+            // Add more assertions as per your requirements
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
+    static void testUpdateSpecialEventBalance() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            c4g_Client_Assistance__c assistance = createAssistance.updateSpecialEventBalance(testContact.Id, '012390000006CF1AAM', 2.5);
             
             // Perform assertions
             System.assertNotEquals(null, assistance, 'Assistance object should not be null');
