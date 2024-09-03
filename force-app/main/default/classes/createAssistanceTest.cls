@@ -36,6 +36,27 @@ private class createAssistanceTest {
         // Clean up
         delete testContact;
     }
+
+    @isTest
+    static void testGetTotalNumberInHousehold() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            List<Case> result = createAssistance.getTotalNumberInHousehold(testContact.Id);
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
     
     @isTest
     static void testGetNumberKids() {
@@ -315,6 +336,28 @@ private class createAssistanceTest {
         // Call the method to be tested within a try-catch block
         try {
             c4g_Client_Assistance__c assistance = createAssistance.updateSchoolSuppliesAssistance(testContact.Id);
+            
+            // Perform assertions
+            System.assertNotEquals(null, assistance, 'Assistance object should not be null');
+            // Add more assertions as per your requirements
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
+    static void testUpdateSeminarAssistance() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            c4g_Client_Assistance__c assistance = createAssistance.updateSeminarAssistance(testContact.Id, 'Financial Workshop', 'Financial Peace University');
             
             // Perform assertions
             System.assertNotEquals(null, assistance, 'Assistance object should not be null');

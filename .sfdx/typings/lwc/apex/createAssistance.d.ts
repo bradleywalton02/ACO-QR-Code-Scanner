@@ -4,6 +4,9 @@ declare module "@salesforce/apex/createAssistance.checkDate" {
 declare module "@salesforce/apex/createAssistance.getKidsForSummerFood" {
   export default function getKidsForSummerFood(param: {contactId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/createAssistance.getTotalNumberInHousehold" {
+  export default function getTotalNumberInHousehold(param: {contactId: any}): Promise<any>;
+}
 declare module "@salesforce/apex/createAssistance.getNumberKids" {
   export default function getNumberKids(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
@@ -45,6 +48,9 @@ declare module "@salesforce/apex/createAssistance.updateNorthPoleAssistance" {
 }
 declare module "@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance" {
   export default function updateSchoolSuppliesAssistance(param: {contactId: any}): Promise<any>;
+}
+declare module "@salesforce/apex/createAssistance.updateSeminarAssistance" {
+  export default function updateSeminarAssistance(param: {contactId: any, typeOfWorkshop: any, workshopName: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.updateSpecialEventBalance" {
   export default function updateSpecialEventBalance(param: {contactId: any, recordTypeId: any, amount: any}): Promise<any>;

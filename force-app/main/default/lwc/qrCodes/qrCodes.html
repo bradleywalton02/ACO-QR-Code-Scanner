@@ -15,9 +15,31 @@
             <lightning-menu-item value="northPole" label="North Pole"></lightning-menu-item>
             <lightning-menu-item value="schoolSupplies" label="School Supplies"></lightning-menu-item>
             <lightning-menu-item value="caresCenter" label="Cares Center"></lightning-menu-item>
+            <lightning-menu-item value="learningAcademy" label="Learning Academy"></lightning-menu-item>
         </lightning-button-menu>
      
         <span style=" display:inline-block; margin-left:10px;"><strong> Selected event: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{selectedItemValue}</span></span>
+    </div>
+
+    <template if:true={learningAcademyVal}>
+        <div class="slds-p-around_medium lgc-bg">
+            <lightning-button-menu alternative-text="Show menu" variant="border-filled" onselect={handleWorkshopChange}>
+                <lightning-menu-item value="Education Workshop" label="Education Workshop"></lightning-menu-item>
+                <lightning-menu-item value="Employment Workshop" label="Employment Workshop"></lightning-menu-item>
+                <lightning-menu-item value="Financial Workshop" label="Financial Workshop"></lightning-menu-item>
+                <lightning-menu-item value="Wellness Workshop" label="Wellness Workshop"></lightning-menu-item>
+            </lightning-button-menu>
+         
+            <span style=" display:inline-block; margin-left:10px;"><strong> Selected workshop: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{workshopType}</span></span>
+        </div>
+    </template>
+
+    <div class="slds-col slds-size_10-of-12">
+        <template if:true={learningAcademyVal}>
+            <div>
+                <lightning-input type="text" name="workshopName" label="Enter Workshop Name" onchange={handleWorkshopName} ></lightning-input>
+            </div>
+        </template>
     </div>
 
     <div class="slds-col slds-size_10-of-12">
@@ -53,6 +75,12 @@
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={dateFP.data} columns={columns1}>
+        </lightning-datatable>
+    </template>
+
+    <template if:true={foodPantryVal}>
+        <lightning-datatable
+        key-field="Id" data={totalNumberInHousehold.data} columns={columns15}>
         </lightning-datatable>
     </template>
 

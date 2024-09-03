@@ -10,6 +10,8 @@ import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
 import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
+import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
+import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eligible_for_Food_Pantry_Shopping__c';
 import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
 import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
@@ -21,8 +23,10 @@ import createCaresCenterAssistance from '@salesforce/apex/createAssistance.creat
 import createCaresCenterItem from '@salesforce/apex/createAssistance.createCaresCenterItem';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
+import updateSeminarAssistance from '@salesforce/apex/createAssistance.updateSeminarAssistance';
 import checkDate from '@salesforce/apex/createAssistance.checkDate';
 import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
+import getTotalNumberInHousehold from '@salesforce/apex/createAssistance.getTotalNumberInHousehold';
 import getChildInfo from '@salesforce/apex/createAssistance.getChildInfo';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 import getKidsForSummerFood from '@salesforce/apex/createAssistance.getKidsForSummerFood';
@@ -36,7 +40,8 @@ import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecial
 import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 
 const COLUMNS1 = [
-    {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+    {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
+    {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS2 = [
@@ -96,6 +101,10 @@ const COLUMNS14 = [
     {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
 ];
 
+const COLUMNS15 = [
+    {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text'}
+];
+
 export default class BarcodeScanner extends LightningElement {
     myScanner;
     scanButtonDisabled = false;
@@ -103,6 +112,7 @@ export default class BarcodeScanner extends LightningElement {
     foodPantryAssistanceCreated = false;
     holidayFoodAssistanceCreated = false;
     summerFoodAssistanceCreated = false;
+    seminarAssistanceUpdated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
     caresCenterCheckedOut = false;
@@ -207,6 +217,10 @@ export default class BarcodeScanner extends LightningElement {
     @wire(getCaresCardBalance, {contactId : '$scannedBarcode'})
     caresCardBalance;
 
+    columns15 = COLUMNS15;
+    @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
+    totalNumberInHousehold;
+
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {
         if (data) {
@@ -222,7 +236,7 @@ export default class BarcodeScanner extends LightningElement {
     @track northPoleVal = false;
     @track schoolSuppliesVal = false;
     @track caresCenterVal = false;
-    @track poundsVal = 0;
+    @track learningAcademyVal = false;
     @track selectedRows = [];
     @track childInfo;
     @track caresCardBalance;
@@ -236,7 +250,9 @@ export default class BarcodeScanner extends LightningElement {
     @track name;
  
     selectedItemValue;
+    workshopType;
     poundsValue;
+    workshopName;
     saveDraftValues = [];
     
     // When component is initialized, detect whether to enable Scan button
@@ -284,6 +300,10 @@ export default class BarcodeScanner extends LightningElement {
                         setTimeout(() => {
                             this.scannedContacts.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
+                    }
+                    if (this.learningAcademyVal) {
+                        updateSeminarAssistance({contactId : this.scannedBarcode, typeOfWorkshop: this.workshopType, workshopName: this.workshopName});
+                        this.seminarAssistanceUpdated = true;
                     }
                     this.dispatchEvent(
                         new ShowToastEvent({
@@ -490,6 +510,14 @@ export default class BarcodeScanner extends LightningElement {
         return this.totalAmount.toFixed(2);
     }
 
+    handleWorkshopChange(event) {
+        this.workshopType = event.detail.value;
+    }
+
+    handleWorkshopName(event) {
+        this.workshopName = event.detail.value;
+    }
+
     handleOnselect(event) {
         this.selectedItemValue = event.detail.value;
  
@@ -515,6 +543,12 @@ export default class BarcodeScanner extends LightningElement {
             this.caresCenterVal = true;
         } else {
             this.caresCenterVal = false;
+        }
+
+        if (this.selectedItemValue == 'learningAcademy') {
+            this.learningAcademyVal = true;
+        } else {
+            this.learningAcademyVal = false;
         }
     }
 

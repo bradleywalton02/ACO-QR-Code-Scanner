@@ -1,7 +1,7 @@
 public with sharing class createAssistance {
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> checkDate(Id contactId, Id recordTypeId) {
-        return [SELECT Date_of_Assistance__c
+        return [SELECT Date_of_Assistance__c,Eligible_for_Food_Pantry_Shopping__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId 
                 AND RecordTypeId = :recordTypeId
@@ -12,6 +12,15 @@ public with sharing class createAssistance {
     @AuraEnabled(cacheable=true)
     public static List<Case> getKidsForSummerFood(Id contactId) {
         return [SELECT Children_in_Your_Home_0_17__c
+                FROM Case
+                WHERE ContactId = :contactId
+                ORDER BY Date_Created__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Case> getTotalNumberInHousehold(Id contactId) {
+        return [SELECT Total_Number_in_Household__c
                 FROM Case
                 WHERE ContactId = :contactId
                 ORDER BY Date_Created__c
@@ -232,6 +241,23 @@ public with sharing class createAssistance {
                                                       DESC LIMIT 1];
 
         queriedAssistance.Client_Picked_Up_School_Supplies__c = true;
+        
+        update queriedAssistance;
+        return queriedAssistance;
+    }
+
+    @AuraEnabled
+    public static c4g_Client_Assistance__c updateSeminarAssistance(Id contactId, String typeOfWorkshop, String workshopName) {
+        c4g_Client_Assistance__c queriedAssistance = [SELECT Seminar__c, Seminar_Attended__c
+                                                      FROM c4g_Client_Assistance__c
+                                                      WHERE c4g_Client__c = :contactId
+                                                      AND RecordTypeId = '0124z000000xUd0AAE'
+                                                      AND Seminar_Attended__c = null
+                                                      ORDER BY Date_of_Assistance__c
+                                                      DESC LIMIT 1];
+
+        queriedAssistance.Seminar__c = typeOfWorkshop;
+        queriedAssistance.Seminar_Attended__c = workshopName;
         
         update queriedAssistance;
         return queriedAssistance;
