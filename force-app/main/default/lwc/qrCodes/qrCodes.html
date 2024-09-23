@@ -15,7 +15,7 @@
             <lightning-menu-item value="northPole" label="North Pole"></lightning-menu-item>
             <lightning-menu-item value="schoolSupplies" label="School Supplies"></lightning-menu-item>
             <lightning-menu-item value="caresCenter" label="Cares Center"></lightning-menu-item>
-            <lightning-menu-item value="learningAcademy" label="Learning Academy"></lightning-menu-item>
+            <lightning-menu-item value="learningAcademy" label="WIP - Learning Academy"></lightning-menu-item>
         </lightning-button-menu>
      
         <span style=" display:inline-block; margin-left:10px;"><strong> Selected event: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{selectedItemValue}</span></span>
@@ -81,6 +81,12 @@
     <template if:true={foodPantryVal}>
         <lightning-datatable
         key-field="Id" data={totalNumberInHousehold.data} columns={columns15}>
+        </lightning-datatable>
+    </template>
+
+    <template if:true={foodPantryVal}>
+        <lightning-datatable
+        key-field="Id" data={noShowStatus.data} columns={columns16}>
         </lightning-datatable>
     </template>
 
@@ -211,6 +217,7 @@
                 <div class="slds-align_absolute-center slds-m-vertical_large">
                     <lightning-button
                         variant="brand"
+                        disabled={isCreateFoodButtonDisabled}
                         class="slds-var-m-left_x-small"
                         icon-name="action:new"
                         label="Create Food Pantry Assistance"

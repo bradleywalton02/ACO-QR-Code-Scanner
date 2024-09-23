@@ -19,6 +19,9 @@ declare module "@salesforce/apex/createAssistance.getNumberBackpacks" {
 declare module "@salesforce/apex/createAssistance.getSpecialEventBalance" {
   export default function getSpecialEventBalance(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/createAssistance.getNoShowStatus" {
+  export default function getNoShowStatus(param: {contactId: any, recordTypeId: any}): Promise<any>;
+}
 declare module "@salesforce/apex/createAssistance.getCaresCenterDates" {
   export default function getCaresCenterDates(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }

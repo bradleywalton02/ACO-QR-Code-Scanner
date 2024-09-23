@@ -68,6 +68,16 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
+    public static List<c4g_Client_Assistance__c> getNoShowStatus(Id contactId, Id recordTypeId) {
+        return [SELECT No_Show_Formula_for_Scanner__c
+                FROM c4g_Client_Assistance__c
+                WHERE c4g_Client__c = :contactId
+                AND RecordTypeId = :recordTypeId
+                ORDER BY Date_of_Assistance__c
+                DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getCaresCenterDates(Id contactId, Id recordTypeId) {
         // Get the current month and year
         Integer currentMonth = Date.today().month();

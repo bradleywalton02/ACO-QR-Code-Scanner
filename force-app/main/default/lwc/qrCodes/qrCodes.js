@@ -16,6 +16,7 @@ import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_w
 import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
 import SPECIAL_EVENT_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Special_Event_Balance__c';
+import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
@@ -38,6 +39,7 @@ import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCare
 import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCenterDates';
 import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecialEventBalance';
 import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
+import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
@@ -103,6 +105,10 @@ const COLUMNS14 = [
 
 const COLUMNS15 = [
     {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS16 = [
+    {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -221,6 +227,10 @@ export default class BarcodeScanner extends LightningElement {
     @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
     totalNumberInHousehold;
 
+    columns16 = COLUMNS16;
+    @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
+    noShowStatus;
+
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {
         if (data) {
@@ -237,6 +247,7 @@ export default class BarcodeScanner extends LightningElement {
     @track schoolSuppliesVal = false;
     @track caresCenterVal = false;
     @track learningAcademyVal = false;
+    @track isCreateFoodButtonDisabled = false;
     @track selectedRows = [];
     @track childInfo;
     @track caresCardBalance;
@@ -291,6 +302,7 @@ export default class BarcodeScanner extends LightningElement {
                 .then((result) => {
                     console.log(result);
                     this.scannedBarcode = result.value;
+                    this.poundsValue = 0;
                     if (this.northPoleVal) {
                         updateNorthPoleAssistance({contactId : this.scannedBarcode});
                         this.northPoleAssistanceUpdated = true;
@@ -370,9 +382,40 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
-    handleCreateFoodPantryAssistance() {
-        createFoodAssistance({contactId : this.scannedBarcode, recordTypeId: '01239000000EG3lAAG', typeOfAssistance: 'Food Pantry', pounds: this.poundsValue});
-        this.foodPantryAssistanceCreated = true;
+    async handleCreateFoodPantryAssistance() {
+        this.isCreateFoodButtonDisabled = true; // Disable button when operation starts
+        try {
+            // Call the Apex method with the correct parameters
+            let result = await createFoodAssistance({
+                contactId: this.scannedBarcode,
+                recordTypeId: '01239000000EG3lAAG',
+                typeOfAssistance: 'Food Pantry',
+                pounds: this.poundsValue
+            });
+            
+            // Update the component state
+            this.foodPantryAssistanceCreated = true;
+    
+            // Show success toast
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Assistance Created',
+                    message: `Assistance created successfully`,
+                    variant: 'success'
+                })
+            );
+        } catch (error) {
+            // Show error toast
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Creating Assistance Failed',
+                    message: `Failed to create assistance: ${error.body.message || JSON.stringify(error)}`,
+                    variant: 'error'
+                })
+            );
+        } finally {
+            this.isCreateFoodButtonDisabled = false;
+        }
     }
 
     handleCreateHolidayFoodAssistance() {
