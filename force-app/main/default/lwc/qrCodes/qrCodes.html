@@ -45,7 +45,7 @@
     <div class="slds-col slds-size_10-of-12">
         <template if:true={foodPantryVal}>
             <div>
-                <lightning-input type="number" name="pounds" label="Enter Food Pantry Pounds" onchange={handlePounds} ></lightning-input>
+                <lightning-input type="number" name="pounds" label="Enter Food Pantry Pounds" value={poundsValue} onchange={handlePounds} ></lightning-input>
             </div>
         </template>
     </div>
@@ -351,14 +351,14 @@
             </div>
         <br><br><br>
         </template>
-        <template for:each={scannedContacts} for:item="contact">
+        <template for:each={scannedContactsCares} for:item="contact">
             <div key={contact.id}>
                 <lightning-button
                     data-id={contact.id}
                     variant="brand"
                     label={contact.name}
                     title="View details of this contact"
-                    onclick={handleSwitchContact}>
+                    onclick={handleSwitchContactCares}>
                 </lightning-button>
             </div>
         </template>

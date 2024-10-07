@@ -255,14 +255,14 @@ export default class BarcodeScanner extends LightningElement {
     @track laundryDetergentData = [];
     @track paperTowelData = [];
     @track toiletPaperData = [];
-    @track scannedContacts = [];
+    @track scannedContactsCares = [];
     @track contact;
     @track clientid;
     @track name;
- 
+    @track poundsValue
+
     selectedItemValue;
     workshopType;
-    poundsValue;
     workshopName;
     saveDraftValues = [];
     
@@ -288,6 +288,7 @@ export default class BarcodeScanner extends LightningElement {
         this.toiletPaperData = [];
         this.selectedRows = [];
         this.totalAmount = 0;
+        this.poundsValue = '';
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -302,7 +303,6 @@ export default class BarcodeScanner extends LightningElement {
                 .then((result) => {
                     console.log(result);
                     this.scannedBarcode = result.value;
-                    this.poundsValue = 0;
                     if (this.northPoleVal) {
                         updateNorthPoleAssistance({contactId : this.scannedBarcode});
                         this.northPoleAssistanceUpdated = true;
@@ -310,7 +310,7 @@ export default class BarcodeScanner extends LightningElement {
                     if (this.caresCenterVal) {
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
                         setTimeout(() => {
-                            this.scannedContacts.push({id: this.scannedBarcode, name: this.name});
+                            this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
                     }
                     if (this.learningAcademyVal) {
@@ -385,6 +385,19 @@ export default class BarcodeScanner extends LightningElement {
     async handleCreateFoodPantryAssistance() {
         this.isCreateFoodButtonDisabled = true; // Disable button when operation starts
         try {
+            // Validate the pounds value
+            if (this.poundsValue <= 0) {
+                // Show error toast if pounds is zero or negative
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Validation Error',
+                        message: 'Pounds value cannot be zero or negative.',
+                        variant: 'error'
+                    })
+                );
+                return; // Exit if the validation fails
+            }
+
             // Call the Apex method with the correct parameters
             let result = await createFoodAssistance({
                 contactId: this.scannedBarcode,
@@ -482,13 +495,13 @@ export default class BarcodeScanner extends LightningElement {
                     })
                 );
             });
-        this.scannedContacts = this.scannedContacts.filter(contact => contact.id != this.scannedBarcode);
+        this.scannedContactsCares = this.scannedContactsCares.filter(contact => contact.id != this.scannedBarcode);
         this.caresCenterCheckedOut = true;
     }
     
-    handleSwitchContact(event) {
+    handleSwitchContactCares(event) {
         const contactId = event.currentTarget.dataset.id;
-        const contact = this.scannedContacts.find(item => item.id == contactId);
+        const contact = this.scannedContactsCares.find(item => item.id == contactId);
 
         if (contact) {
             this.scannedBarcode = '';
