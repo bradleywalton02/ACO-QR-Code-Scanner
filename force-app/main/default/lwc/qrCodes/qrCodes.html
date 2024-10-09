@@ -351,16 +351,31 @@
             </div>
         <br><br><br>
         </template>
-        <template for:each={scannedContactsCares} for:item="contact">
-            <div key={contact.id}>
-                <lightning-button
-                    data-id={contact.id}
-                    variant="brand"
-                    label={contact.name}
-                    title="View details of this contact"
-                    onclick={handleSwitchContactCares}>
-                </lightning-button>
-            </div>
+        <template if:true={caresCenterVal}>
+            <template for:each={scannedContactsCares} for:item="contact">
+                <div key={contact.id}>
+                    <lightning-button
+                        data-id={contact.id}
+                        variant="brand"
+                        label={contact.name}
+                        title="View details of this contact"
+                        onclick={handleSwitchContactCares}>
+                    </lightning-button>
+                </div>
+            </template>
+        </template>
+        <template if:true={foodPantryVal}>
+            <template for:each={scannedContactsFood} for:item="contact">
+                <div key={contact.id}>
+                    <lightning-button
+                        data-id={contact.id}
+                        variant="brand"
+                        label={contact.name}
+                        title="View details of this contact"
+                        onclick={handleSwitchContactFood}>
+                    </lightning-button>
+                </div>
+            </template>
         </template>
     </template>
 </template>

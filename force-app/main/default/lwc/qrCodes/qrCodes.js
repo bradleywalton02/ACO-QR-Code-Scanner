@@ -256,6 +256,7 @@ export default class BarcodeScanner extends LightningElement {
     @track paperTowelData = [];
     @track toiletPaperData = [];
     @track scannedContactsCares = [];
+    @track scannedContactsFood = [];
     @track contact;
     @track clientid;
     @track name;
@@ -311,6 +312,11 @@ export default class BarcodeScanner extends LightningElement {
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
                         setTimeout(() => {
                             this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
+                        }, 2000);
+                    }
+                    if (this.foodPantryVal) {
+                        setTimeout(() => {
+                            this.scannedContactsFood.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
                     }
                     if (this.learningAcademyVal) {
@@ -408,6 +414,9 @@ export default class BarcodeScanner extends LightningElement {
             
             // Update the component state
             this.foodPantryAssistanceCreated = true;
+
+            // Remove contact from contact list
+            this.scannedContactsFood = this.scannedContactsFood.filter(contact => contact.id != this.scannedBarcode);
     
             // Show success toast
             this.dispatchEvent(
@@ -511,6 +520,21 @@ export default class BarcodeScanner extends LightningElement {
             this.toiletPaperData = [];
             this.selectedRows = [];
             this.totalAmount = 0;
+            setTimeout(() => {
+                this.scannedBarcode = contact.id;
+                this.name = contact.name;
+            }, 100);
+        }
+    }
+
+    handleSwitchContactFood(event) {
+        const contactId = event.currentTarget.dataset.id;
+        const contact = this.scannedContactsFood.find(item => item.id == contactId);
+
+        if (contact) {
+            this.scannedBarcode = '';
+            this.foodPantryAssistanceCreated = false;
+            this.poundsValue = '';
             setTimeout(() => {
                 this.scannedBarcode = contact.id;
                 this.name = contact.name;
