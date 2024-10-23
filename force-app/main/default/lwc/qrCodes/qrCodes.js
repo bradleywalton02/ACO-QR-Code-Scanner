@@ -81,7 +81,8 @@ const COLUMNS9 = [
 ];
 
 const COLUMNS10 = [
-    {label: 'Cares Center Visits This Month', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
+    {label: 'Cares Center Visits This Month', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
+    {label: 'No Show', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS11 = [

@@ -96,7 +96,7 @@ public with sharing class createAssistance {
                                     AND Date_of_Assistance__c <= :endDate];
     
         // Query for the assistances with the calculated limit
-        return [SELECT Date_of_Assistance__c
+        return [SELECT Date_of_Assistance__c,No_Show_Formula_for_Scanner__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId 
                 AND RecordTypeId = :recordTypeId
