@@ -310,7 +310,6 @@ export default class BarcodeScanner extends LightningElement {
                         this.northPoleAssistanceUpdated = true;
                     }
                     if (this.caresCenterVal) {
-                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA'});
                         setTimeout(() => {
                             this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
@@ -479,6 +478,7 @@ export default class BarcodeScanner extends LightningElement {
     }
 
     handleCaresCenterCheckOut() {
+        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: this.totalAmount});
         this.selectedRows.forEach(row => {
             if (row.Name == 'Laundry Detergent') {
                 createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Laundry Detergent'});

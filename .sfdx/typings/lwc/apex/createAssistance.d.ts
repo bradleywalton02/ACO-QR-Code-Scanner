@@ -41,7 +41,7 @@ declare module "@salesforce/apex/createAssistance.createFoodAssistance" {
   export default function createFoodAssistance(param: {contactId: any, recordTypeId: any, typeOfAssistance: any, pounds: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.createCaresCenterAssistance" {
-  export default function createCaresCenterAssistance(param: {contactId: any, recordTypeId: any}): Promise<any>;
+  export default function createCaresCenterAssistance(param: {contactId: any, recordTypeId: any, amountSpent: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.createCaresCenterItem" {
   export default function createCaresCenterItem(param: {contactId: any, itemName: any}): Promise<any>;

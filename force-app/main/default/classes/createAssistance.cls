@@ -172,7 +172,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled
-    public static c4g_Client_Assistance__c createCaresCenterAssistance(Id contactId, Id recordTypeId) {
+    public static c4g_Client_Assistance__c createCaresCenterAssistance(Id contactId, Id recordTypeId, Decimal amountSpent) {
         List<c4g_Client_Assistance__c> existingAssistances = [SELECT Id
                                                               FROM c4g_Client_Assistance__c
                                                               WHERE c4g_Client__c = :contactId
@@ -199,6 +199,7 @@ public with sharing class createAssistance {
             c4g_Client_Service__c = serviceId,
             Case__c = serviceCaseId,
             RecordTypeId = recordTypeId,
+            ACO_Cares_Account_Amount_Spent__c = amountSpent,
             Date_of_Assistance__c = date.today());
 
         insert assistance;

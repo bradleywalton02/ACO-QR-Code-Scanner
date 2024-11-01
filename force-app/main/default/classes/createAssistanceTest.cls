@@ -271,7 +271,7 @@ private class createAssistanceTest {
         
         // Call the method to be tested within a try-catch block
         try {
-            c4g_Client_Assistance__c assistance = createAssistance.createCaresCenterAssistance(testContact.Id, '012Nt000000plo5');
+            c4g_Client_Assistance__c assistance = createAssistance.createCaresCenterAssistance(testContact.Id, '012Nt000000plo5', 17);
         
             // Perform assertions
             System.assertNotEquals(null, assistance, 'Assistance object should not be null');
