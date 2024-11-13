@@ -310,6 +310,7 @@ export default class BarcodeScanner extends LightningElement {
                         this.northPoleAssistanceUpdated = true;
                     }
                     if (this.caresCenterVal) {
+                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         setTimeout(() => {
                             this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);

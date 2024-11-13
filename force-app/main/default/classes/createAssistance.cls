@@ -173,37 +173,41 @@ public with sharing class createAssistance {
 
     @AuraEnabled
     public static c4g_Client_Assistance__c createCaresCenterAssistance(Id contactId, Id recordTypeId, Decimal amountSpent) {
-        List<c4g_Client_Assistance__c> existingAssistances = [SELECT Id
+        List<c4g_Client_Assistance__c> assistanceList = [SELECT Id,ACO_Cares_Account_Amount_Spent__c
                                                               FROM c4g_Client_Assistance__c
                                                               WHERE c4g_Client__c = :contactId
                                                               AND RecordTypeId = :recordTypeId
                                                               AND Date_of_Assistance__c = TODAY
                                                               LIMIT 1];
 
-        if (!existingAssistances.isEmpty()) {
-            return null;
+        if (!assistanceList.isEmpty()) {
+            c4g_Client_Assistance__c existingAssistance = assistanceList[0];
+            existingAssistance.ACO_Cares_Account_Amount_Spent__c = amountSpent;
+
+            update existingAssistance;
+            return existingAssistance;
+        } else {
+            c4g_Client_Service__c queriedService = [SELECT Id, c4g_Case__c
+                                                    FROM c4g_Client_Service__c
+                                                    WHERE c4g_Client__c = :contactId
+                                                    AND RecordTypeId = '01239000000AmBwAAK'
+                                                    ORDER BY CreatedDate
+                                                    DESC LIMIT 1];
+
+            Id serviceId = queriedService.Id;
+            Id serviceCaseId = queriedService.c4g_Case__c;
+            
+            c4g_Client_Assistance__c assistance = new c4g_Client_Assistance__c(
+                c4g_Client__c = contactId,
+                c4g_Client_Service__c = serviceId,
+                Case__c = serviceCaseId,
+                RecordTypeId = recordTypeId,
+                ACO_Cares_Account_Amount_Spent__c = amountSpent,
+                Date_of_Assistance__c = date.today());
+
+            insert assistance;
+            return assistance;
         }
-
-        c4g_Client_Service__c queriedService = [SELECT Id, c4g_Case__c
-                                                FROM c4g_Client_Service__c
-                                                WHERE c4g_Client__c = :contactId
-                                                AND RecordTypeId = '01239000000AmBwAAK'
-                                                ORDER BY CreatedDate
-                                                DESC LIMIT 1];
-
-        Id serviceId = queriedService.Id;
-        Id serviceCaseId = queriedService.c4g_Case__c;
-        
-        c4g_Client_Assistance__c assistance = new c4g_Client_Assistance__c(
-            c4g_Client__c = contactId,
-            c4g_Client_Service__c = serviceId,
-            Case__c = serviceCaseId,
-            RecordTypeId = recordTypeId,
-            ACO_Cares_Account_Amount_Spent__c = amountSpent,
-            Date_of_Assistance__c = date.today());
-
-        insert assistance;
-        return assistance;
     }
 
     @AuraEnabled
