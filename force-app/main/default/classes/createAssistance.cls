@@ -39,12 +39,12 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Holiday__c> getChildInfo(Id contactId, String campaignName) {
-        return [SELECT Child_Name__c,Eligible_for_Bike__c,Date_Bike_was_Received__c
+        return [SELECT Child_Name__c,Child_Age__c
                 FROM Holiday__c
                 WHERE Contact__c = :contactId
                 AND Campaign_Name__c = :campaignName
-                ORDER BY Child_Name__c
-                ASC];
+                ORDER BY Child_Age__c
+                DESC];
     }
 
     @AuraEnabled(cacheable=true)
@@ -144,6 +144,18 @@ public with sharing class createAssistance {
                 AND RecordTypeId = '0124z000000xUcgAAE'
                 ORDER BY Date_of_Assistance__c
                 DESC LIMIT 1];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Event> getAppointmentDateTime(Id contactId, String subject) {
+        String likeClause = '%' + subject + '%';
+
+        return [SELECT Event_Start_Date_Time_as_Text__c
+                FROM Event
+                WHERE WhoId = :contactId
+                AND Subject LIKE :likeClause
+                ORDER BY Event_Start_Date_Time_as_Text__c
+                DESC];
     }
 
     @AuraEnabled

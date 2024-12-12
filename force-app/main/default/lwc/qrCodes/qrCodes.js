@@ -6,8 +6,9 @@ import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
 import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
 import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
-import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
-import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
+import CHILD_AGE from '@salesforce/schema/Holiday__c.Child_Age__c';
+// import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
+// import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
@@ -17,6 +18,7 @@ import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligibl
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
 import SPECIAL_EVENT_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Special_Event_Balance__c';
 import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
+import APPOINTMENT_DATE_TIME_FIELD from '@salesforce/schema/Event.Event_Start_Date_Time_as_Text__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
@@ -40,6 +42,7 @@ import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCente
 import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecialEventBalance';
 import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
+import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
@@ -64,8 +67,7 @@ const COLUMNS5 = [
 
 const COLUMNS6 = [
     {label: 'Name of Child', fieldName: CHILD_NAME.fieldApiName, type: 'text'},
-    {label: 'Eligible for Bike', fieldName: ELIGIBLE_FIELD.fieldApiName, type: 'text'},
-    {label: 'Date Child Received Bike', fieldName: BIKE_FIELD.fieldApiName, type: 'text', editable: true}
+    {label: 'Age of Child', fieldName: CHILD_AGE.fieldApiName, type: 'text'},
 ];
 
 const COLUMNS7 = [
@@ -110,6 +112,10 @@ const COLUMNS15 = [
 
 const COLUMNS16 = [
     {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+];
+
+const COLUMNS17 = [
+    {label: 'Appointment Date/Time', fieldName: APPOINTMENT_DATE_TIME_FIELD.fieldApiName, type: 'text'}
 ];
 
 export default class BarcodeScanner extends LightningElement {
@@ -231,6 +237,10 @@ export default class BarcodeScanner extends LightningElement {
     columns16 = COLUMNS16;
     @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
     noShowStatus;
+
+    columns17 = COLUMNS17;
+    @wire(getAppointmentDateTime, {contactId : '$scannedBarcode', subject: 'North Pole - Calendly'})
+    appointmentDateTime;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {

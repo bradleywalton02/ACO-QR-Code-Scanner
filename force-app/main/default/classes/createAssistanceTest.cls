@@ -240,6 +240,27 @@ private class createAssistanceTest {
         // Clean up
         delete testContact;
     }
+
+    @isTest
+    static void testGetAppointmentDateTime() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            List<Event> result = createAssistance.getAppointmentDateTime(testContact.Id, 'North Pole - Calendly');
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
     
     @isTest
     static void testCreateFoodAssistance() {

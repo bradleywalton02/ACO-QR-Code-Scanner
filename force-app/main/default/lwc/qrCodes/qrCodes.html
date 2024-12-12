@@ -115,6 +115,12 @@
         </template>
     </template>
 
+    <!-- <template if:true={northPoleVal}>
+        <lightning-datatable
+        key-field="Id" data={appointmentDateTime.data} columns={columns17}>
+        </lightning-datatable>
+    </template> -->
+
     <template if:true={northPoleVal}>
         <lightning-datatable
         key-field="Id" data={numberKids.data} columns={columns5}>
@@ -123,9 +129,8 @@
 
     <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={childInfo.data} columns={columns6} onsave={handleSave} draft-values={saveDraftValues}>
+        key-field="Id" data={childInfo.data} columns={columns6}>
         </lightning-datatable>
-        <br>
     </template>
 
     <template if:true={schoolSuppliesVal}>

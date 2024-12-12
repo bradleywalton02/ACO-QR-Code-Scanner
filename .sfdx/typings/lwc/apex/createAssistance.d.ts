@@ -37,6 +37,9 @@ declare module "@salesforce/apex/createAssistance.getToiletPaper" {
 declare module "@salesforce/apex/createAssistance.getCaresCardBalance" {
   export default function getCaresCardBalance(param: {contactId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/createAssistance.getAppointmentDateTime" {
+  export default function getAppointmentDateTime(param: {contactId: any, subject: any}): Promise<any>;
+}
 declare module "@salesforce/apex/createAssistance.createFoodAssistance" {
   export default function createFoodAssistance(param: {contactId: any, recordTypeId: any, typeOfAssistance: any, pounds: any}): Promise<any>;
 }
