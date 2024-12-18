@@ -7,6 +7,7 @@ import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assi
 import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
 import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
 import CHILD_AGE from '@salesforce/schema/Holiday__c.Child_Age__c';
+import CHILD_GENDER from '@salesforce/schema/Holiday__c.Gender__c';
 // import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
 // import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
 import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
@@ -67,7 +68,8 @@ const COLUMNS5 = [
 
 const COLUMNS6 = [
     {label: 'Name of Child', fieldName: CHILD_NAME.fieldApiName, type: 'text'},
-    {label: 'Age of Child', fieldName: CHILD_AGE.fieldApiName, type: 'text'},
+    {label: 'Age', fieldName: CHILD_AGE.fieldApiName, type: 'text'},
+    {label: 'Gender', fieldName: CHILD_GENDER.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS7 = [

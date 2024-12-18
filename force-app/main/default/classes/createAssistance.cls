@@ -39,7 +39,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Holiday__c> getChildInfo(Id contactId, String campaignName) {
-        return [SELECT Child_Name__c,Child_Age__c
+        return [SELECT Child_Name__c,Child_Age__c,Gender__C
                 FROM Holiday__c
                 WHERE Contact__c = :contactId
                 AND Campaign_Name__c = :campaignName
