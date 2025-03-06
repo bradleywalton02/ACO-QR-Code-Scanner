@@ -158,6 +158,22 @@ public with sharing class createAssistance {
                 DESC];
     }
 
+    @AuraEnabled(cacheable=true)
+    public static Boolean isContactSuspended(Id contactId, String location) {
+        Date today = Date.today();
+        Date last30Days = today.addDays(-30);
+
+        Integer suspensionCount = [
+            SELECT COUNT()
+            FROM Suspension__c
+            WHERE Contact__c = :contactId
+            AND Location__c = :location
+            AND (CreatedDate >= :last30Days OR Permanent_Suspension__c = true)
+        ];
+
+        return suspensionCount > 0;
+    }
+
     @AuraEnabled
     public static c4g_Client_Assistance__c createFoodAssistance(Id contactId, Id recordTypeId, String typeOfAssistance, Integer pounds) {
         c4g_Client_Service__c queriedService = [SELECT Id, c4g_Case__c

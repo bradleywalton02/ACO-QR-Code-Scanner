@@ -44,6 +44,7 @@ import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecial
 import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
+import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
@@ -274,6 +275,7 @@ export default class BarcodeScanner extends LightningElement {
     @track clientid;
     @track name;
     @track poundsValue
+    @track isSuspended = false;
 
     selectedItemValue;
     workshopType;
@@ -303,6 +305,8 @@ export default class BarcodeScanner extends LightningElement {
         this.selectedRows = [];
         this.totalAmount = 0;
         this.poundsValue = '';
+        this.isSuspended = false;
+        this.locationSuspended = '';
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -326,16 +330,25 @@ export default class BarcodeScanner extends LightningElement {
                         setTimeout(() => {
                             this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
+                        this.locationSuspended = 'Cares Center';
                     }
                     if (this.foodPantryVal) {
                         setTimeout(() => {
                             this.scannedContactsFood.push({id: this.scannedBarcode, name: this.name});
                         }, 2000);
+                        this.locationSuspended = 'Food Pantry';
                     }
                     if (this.learningAcademyVal) {
                         updateSeminarAssistance({contactId : this.scannedBarcode, typeOfWorkshop: this.workshopType, workshopName: this.workshopName});
                         this.seminarAssistanceUpdated = true;
                     }
+                    isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
+                        .then(result => {
+                            this.isSuspended = result;
+                        })
+                        .catch(error => {
+                            console.error('Error checking suspension:', error);
+                        });
                     this.dispatchEvent(
                         new ShowToastEvent({
                             title: 'Successful Scan',

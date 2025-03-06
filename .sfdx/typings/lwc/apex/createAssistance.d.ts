@@ -40,6 +40,9 @@ declare module "@salesforce/apex/createAssistance.getCaresCardBalance" {
 declare module "@salesforce/apex/createAssistance.getAppointmentDateTime" {
   export default function getAppointmentDateTime(param: {contactId: any, subject: any}): Promise<any>;
 }
+declare module "@salesforce/apex/createAssistance.isContactSuspended" {
+  export default function isContactSuspended(param: {contactId: any, location: any}): Promise<any>;
+}
 declare module "@salesforce/apex/createAssistance.createFoodAssistance" {
   export default function createFoodAssistance(param: {contactId: any, recordTypeId: any, typeOfAssistance: any, pounds: any}): Promise<any>;
 }

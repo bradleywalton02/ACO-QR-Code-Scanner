@@ -58,6 +58,12 @@
         <span class="slds-text-heading_small">{clientid}<br/>{name}</span>
     </div>
 
+    <template if:true={isSuspended}>
+        <div style="color: red; font-size: 48px; font-weight: bold; text-align: center;">
+            SUSPENDED
+        </div>
+    </template>
+
     <!-- The click-to-scan button;
         Disabled if QR Code Scanner isn't available -->
     <div class="slds-align_absolute-center slds-m-vertical_large">

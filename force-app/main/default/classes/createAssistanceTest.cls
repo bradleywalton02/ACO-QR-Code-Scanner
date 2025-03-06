@@ -261,6 +261,29 @@ private class createAssistanceTest {
         // Clean up
         delete testContact;
     }
+
+    @isTest
+    static void testSuspensionCheck() {
+        // Create a test contact
+        Contact testContact = new Contact(FirstName = 'Test', LastName = 'User');
+        insert testContact;
+
+        // Create a suspension record for the contact within the last 30 days
+        Suspension__c suspension = new Suspension__c(Contact__c = testContact.Id, CreatedDate = System.today().addDays(-10), Location__c = 'Food Pantry');
+        insert suspension;
+
+        // Call the method to check for suspension
+        Boolean isSuspended = createAssistance.isContactSuspended(testContact.Id, 'Food Pantry');
+        System.assertEquals(true, isSuspended, 'Contact should be suspended');
+
+        // Create a test contact without suspension
+        Contact testContact2 = new Contact(FirstName = 'No', LastName = 'Suspension');
+        insert testContact2;
+
+        // Call the method for a contact without suspension
+        Boolean isNotSuspended = createAssistance.isContactSuspended(testContact2.Id, 'Food Pantry');
+        System.assertEquals(false, isNotSuspended, 'Contact should not be suspended');
+    }
     
     @isTest
     static void testCreateFoodAssistance() {
