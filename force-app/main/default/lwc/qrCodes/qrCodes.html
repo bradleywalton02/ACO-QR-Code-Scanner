@@ -363,12 +363,25 @@
         <br><br><br>
         </template>
         <template if:true={caresCenterVal}>
-            <template for:each={scannedContactsCares} for:item="contact">
-                <div key={contact.id}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:refresh"
+                    label="Refresh Contact List"
+                    title="Sync the list with Salesforce"
+                    onclick={handleRefreshCares}>
+                </lightning-button>
+            </div>
+        <br><br><br>
+        </template>
+        <template if:true={caresCenterVal}>
+            <template for:each={caresScannedContacts} for:item="contact">
+                <div key={contact.Id}>
                     <lightning-button
-                        data-id={contact.id}
+                        data-id={contact.Contact_ID__c}
                         variant="brand"
-                        label={contact.name}
+                        label={contact.Contact_Name__c}
                         title="View details of this contact"
                         onclick={handleSwitchContactCares}>
                     </lightning-button>
@@ -376,12 +389,25 @@
             </template>
         </template>
         <template if:true={foodPantryVal}>
-            <template for:each={scannedContactsFood} for:item="contact">
-                <div key={contact.id}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:refresh"
+                    label="Refresh Contact List"
+                    title="Sync the list with Salesforce"
+                    onclick={handleRefreshFood}>
+                </lightning-button>
+            </div>
+        <br><br><br>
+        </template>
+        <template if:true={foodPantryVal}>
+            <template for:each={foodScannedContacts} for:item="contact">
+                <div key={contact.Id}>
                     <lightning-button
-                        data-id={contact.id}
+                        data-id={contact.Contact_ID__c}
                         variant="brand"
-                        label={contact.name}
+                        label={contact.Contact_Name__c}
                         title="View details of this contact"
                         onclick={handleSwitchContactFood}>
                     </lightning-button>

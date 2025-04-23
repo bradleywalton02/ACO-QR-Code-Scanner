@@ -78,6 +78,45 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
+    public static List<Scanned_Contact__c> getScannedContacts(String eventType) {
+        return [
+            SELECT Id, Contact_ID__c, Contact_Name__c, Event_Type__c
+            FROM Scanned_Contact__c
+            WHERE Event_Type__c = :eventType
+        ];
+    }
+
+    @AuraEnabled
+    public static void createScannedContact(Id contactId, String contactName, String eventType) {
+        List<Scanned_Contact__c> existing = [
+            SELECT Id
+            FROM Scanned_Contact__c
+            WHERE Contact_ID__c = :contactId
+            AND Event_Type__c = :eventType
+            LIMIT 1
+        ];
+        if (existing.isEmpty()) {
+            insert new Scanned_Contact__c(
+                Contact_ID__c = contactId,
+                Contact_Name__c = contactName,
+                Event_Type__c = eventType
+            );
+        }
+    }
+
+    @AuraEnabled
+    public static void deleteScannedContact(Id contactId, String eventType) {
+        List<Scanned_Contact__c> matches = [
+            SELECT Id
+            FROM Scanned_Contact__c
+            WHERE Contact_ID__c = :contactId
+            AND Event_Type__c = :eventType
+        ];
+        delete matches;
+    }
+
+
+    @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getCaresCenterDates(Id contactId, Id recordTypeId) {
         // Get the current month and year
         Integer currentMonth = Date.today().month();

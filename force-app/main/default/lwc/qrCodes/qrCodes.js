@@ -45,6 +45,9 @@ import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateS
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
 import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
+import getScannedContacts from '@salesforce/apex/createAssistance.getScannedContacts';
+import createScannedContact from '@salesforce/apex/createAssistance.createScannedContact';
+import deleteScannedContact from '@salesforce/apex/createAssistance.deleteScannedContact';
 
 const COLUMNS1 = [
     {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
@@ -256,6 +259,20 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
+    @wire(getScannedContacts, {eventType: 'Cares Center'})
+    wiredScannedContactsCares;
+    
+    @wire(getScannedContacts, {eventType: 'Food Pantry'})
+    wiredScannedContactsFood;
+
+    get caresScannedContacts() {
+        return this.wiredScannedContactsCares?.data || [];
+    }
+    
+    get foodScannedContacts() {
+        return this.wiredScannedContactsFood?.data || [];
+    }
+
     @track foodPantryVal = false;
     @track northPoleVal = false;
     @track schoolSuppliesVal = false;
@@ -269,8 +286,6 @@ export default class BarcodeScanner extends LightningElement {
     @track laundryDetergentData = [];
     @track paperTowelData = [];
     @track toiletPaperData = [];
-    @track scannedContactsCares = [];
-    @track scannedContactsFood = [];
     @track contact;
     @track clientid;
     @track name;
@@ -281,7 +296,7 @@ export default class BarcodeScanner extends LightningElement {
     workshopType;
     workshopName;
     saveDraftValues = [];
-    
+
     // When component is initialized, detect whether to enable Scan button
     connectedCallback() {
         this.myScanner = getBarcodeScanner();
@@ -328,13 +343,23 @@ export default class BarcodeScanner extends LightningElement {
                     if (this.caresCenterVal) {
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         setTimeout(() => {
-                            this.scannedContactsCares.push({id: this.scannedBarcode, name: this.name});
+                            createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Cares Center'})
+                                .then(() => {
+                                    // Refresh the data after creation
+                                    return refreshApex(this.wiredScannedContactsCares);
+                                })
+                                .catch(error => console.error('Error creating Scanned Contact:', error));
                         }, 2000);
                         this.locationSuspended = 'Cares Center';
                     }
                     if (this.foodPantryVal) {
                         setTimeout(() => {
-                            this.scannedContactsFood.push({id: this.scannedBarcode, name: this.name});
+                            createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Food Pantry'})
+                                .then(() => {
+                                    // Refresh the data after creation
+                                    return refreshApex(this.wiredScannedContactsFood);
+                                })
+                                .catch(error => console.error('Error creating Scanned Contact:', error));
                         }, 2000);
                         this.locationSuspended = 'Food Pantry';
                     }
@@ -442,7 +467,12 @@ export default class BarcodeScanner extends LightningElement {
             this.foodPantryAssistanceCreated = true;
 
             // Remove contact from contact list
-            this.scannedContactsFood = this.scannedContactsFood.filter(contact => contact.id != this.scannedBarcode);
+            deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Food Pantry'})
+                .then(() => {
+                    // Refresh the data after deletion
+                    return refreshApex(this.wiredScannedContactsFood);
+                })
+                .catch(error => console.error('Error deleting Scanned Contact:', error));
     
             // Show success toast
             this.dispatchEvent(
@@ -518,6 +548,7 @@ export default class BarcodeScanner extends LightningElement {
                 createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Toilet Paper'});
             }
         });
+
         updateCaresCardBalance({contactId : this.scannedBarcode, amount: this.totalAmount})
             .then(res => {
                 this.refresh();
@@ -531,43 +562,46 @@ export default class BarcodeScanner extends LightningElement {
                     })
                 );
             });
-        this.scannedContactsCares = this.scannedContactsCares.filter(contact => contact.id != this.scannedBarcode);
-        this.caresCenterCheckedOut = true;
-    }
-    
-    handleSwitchContactCares(event) {
-        const contactId = event.currentTarget.dataset.id;
-        const contact = this.scannedContactsCares.find(item => item.id == contactId);
 
+        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
+            .then(() => {
+                // Refresh the data after deletion
+                return refreshApex(this.wiredScannedContactsCares);
+            })
+            .catch(error => console.error('Error deleting Scanned Contact:', error));
+
+        this.caresCenterCheckedOut = true;
+    }   
+    
+    async handleSwitchContactCares(event) {
+        const contactId = event.currentTarget.dataset.id;
+        const contact = this.caresScannedContacts.find(item => item.Contact_ID__c == contactId);
+    
         if (contact) {
-            this.scannedBarcode = '';
-            this.caresCenterCheckedOut = false;
-            this.laundryDetergentData = [];
+            this.scannedBarcode = contact.Contact_ID__c;
+            this.name = contact.Contact_Name__c;
+            this.caresCenterCheckedOut = false; 
+            this.laundryDetergentData = []; 
             this.paperTowelData = [];
             this.toiletPaperData = [];
             this.selectedRows = [];
             this.totalAmount = 0;
-            setTimeout(() => {
-                this.scannedBarcode = contact.id;
-                this.name = contact.name;
-            }, 100);
         }
     }
+    
 
-    handleSwitchContactFood(event) {
+    async handleSwitchContactFood(event) {
         const contactId = event.currentTarget.dataset.id;
-        const contact = this.scannedContactsFood.find(item => item.id == contactId);
-
+        const contact = this.foodScannedContacts.find(item => item.Contact_ID__c == contactId);
+    
         if (contact) {
-            this.scannedBarcode = '';
+            this.scannedBarcode = contact.Contact_ID__c;
+            this.name = contact.Contact_Name__c;
             this.foodPantryAssistanceCreated = false;
             this.poundsValue = '';
-            setTimeout(() => {
-                this.scannedBarcode = contact.id;
-                this.name = contact.name;
-            }, 100);
         }
     }
+    
 
     handleKeyUpAdd(event) {
         if (event.keyCode == 13) { // 13 is the key code for Enter
@@ -689,6 +723,14 @@ export default class BarcodeScanner extends LightningElement {
         }).finally(() => {
             this.saveDraftValues = [];
         });
+    }
+
+    handleRefreshFood() {
+        refreshApex(this.wiredScannedContactsFood);
+    }
+
+    handleRefreshCares() {
+        refreshApex(this.wiredScannedContactsCares);
     }
 
     // This function is used to refresh the table once data updated

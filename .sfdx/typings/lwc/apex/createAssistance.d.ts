@@ -22,6 +22,15 @@ declare module "@salesforce/apex/createAssistance.getSpecialEventBalance" {
 declare module "@salesforce/apex/createAssistance.getNoShowStatus" {
   export default function getNoShowStatus(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
+declare module "@salesforce/apex/createAssistance.getScannedContacts" {
+  export default function getScannedContacts(param: {eventType: any}): Promise<any>;
+}
+declare module "@salesforce/apex/createAssistance.createScannedContact" {
+  export default function createScannedContact(param: {contactId: any, contactName: any, eventType: any}): Promise<any>;
+}
+declare module "@salesforce/apex/createAssistance.deleteScannedContact" {
+  export default function deleteScannedContact(param: {contactId: any, eventType: any}): Promise<any>;
+}
 declare module "@salesforce/apex/createAssistance.getCaresCenterDates" {
   export default function getCaresCenterDates(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
