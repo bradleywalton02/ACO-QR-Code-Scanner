@@ -388,6 +388,20 @@
                 </div>
             </template>
         </template>
+        <br><br><br>
+        <template if:true={caresCenterVal}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:reject"
+                    label="Remove Current Contact from List"
+                    title="Delete the Scanned Contact"
+                    onclick={handleCaresCenterDeleteScan}>
+                </lightning-button>
+            </div>
+        <br><br><br>
+        </template>
         <template if:true={foodPantryVal}>
             <div class="slds-align_absolute-center slds-m-vertical_large">
                 <lightning-button
@@ -413,6 +427,20 @@
                     </lightning-button>
                 </div>
             </template>
+        </template>
+        <br><br><br>
+        <template if:true={foodPantryVal}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:reject"
+                    label="Remove Current Contact from List"
+                    title="Delete the Scanned Contact"
+                    onclick={handleFoodPantryDeleteScan}>
+                </lightning-button>
+            </div>
+        <br><br><br>
         </template>
     </template>
 </template>

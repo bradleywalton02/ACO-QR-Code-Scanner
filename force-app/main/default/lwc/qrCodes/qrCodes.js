@@ -571,7 +571,25 @@ export default class BarcodeScanner extends LightningElement {
             .catch(error => console.error('Error deleting Scanned Contact:', error));
 
         this.caresCenterCheckedOut = true;
-    }   
+    }
+
+    handleFoodPantryDeleteScan() {
+        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Food Pantry'})
+        .then(() => {
+            // Refresh the data after deletion
+            return refreshApex(this.wiredScannedContactsFood);
+        })
+        .catch(error => console.error('Error deleting Scanned Contact:', error));
+    }
+
+    handleCaresCenterDeleteScan() {
+        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
+        .then(() => {
+            // Refresh the data after deletion
+            return refreshApex(this.wiredScannedContactsCares);
+        })
+        .catch(error => console.error('Error deleting Scanned Contact:', error));
+    }
     
     async handleSwitchContactCares(event) {
         const contactId = event.currentTarget.dataset.id;
