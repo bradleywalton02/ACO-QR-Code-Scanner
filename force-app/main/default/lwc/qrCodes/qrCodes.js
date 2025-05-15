@@ -303,6 +303,7 @@ export default class BarcodeScanner extends LightningElement {
         if (this.myScanner == null || !this.myScanner.isAvailable()) {
             this.scanButtonDisabled = true;
         }
+        this.scannedBarcode = null;
     }
 
     handleBeginScanClick(event) {
@@ -314,10 +315,12 @@ export default class BarcodeScanner extends LightningElement {
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
         this.caresCenterCheckedOut = false;
-        this.laundryDetergentData = [];
-        this.paperTowelData = [];
-        this.toiletPaperData = [];
-        this.selectedRows = [];
+        setTimeout(() => {
+            this.laundryDetergentData = [];
+            this.paperTowelData = [];
+            this.toiletPaperData = [];
+            this.selectedRows = [];
+        }, 2000);
         this.totalAmount = 0;
         this.poundsValue = '';
         this.isSuspended = false;
@@ -599,14 +602,15 @@ export default class BarcodeScanner extends LightningElement {
             this.scannedBarcode = contact.Contact_ID__c;
             this.name = contact.Contact_Name__c;
             this.caresCenterCheckedOut = false; 
-            this.laundryDetergentData = []; 
-            this.paperTowelData = [];
-            this.toiletPaperData = [];
-            this.selectedRows = [];
+            setTimeout(() => {
+                this.laundryDetergentData = [];
+                this.paperTowelData = [];
+                this.toiletPaperData = [];
+                this.selectedRows = [];
+            }, 2000);
             this.totalAmount = 0;
         }
     }
-    
 
     async handleSwitchContactFood(event) {
         const contactId = event.currentTarget.dataset.id;
@@ -619,7 +623,6 @@ export default class BarcodeScanner extends LightningElement {
             this.poundsValue = '';
         }
     }
-    
 
     handleKeyUpAdd(event) {
         if (event.keyCode == 13) { // 13 is the key code for Enter
