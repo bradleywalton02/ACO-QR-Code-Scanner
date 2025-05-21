@@ -147,7 +147,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Cares_Center_Item__c> getLaundryDetergent(Id contactId) {
-        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+        return [SELECT Id,Name,Date_Item_was_Received__c,Eligible_for_Item__c
                 FROM Cares_Center_Item__c
                 WHERE Contact__c = :contactId
                 AND Name = 'Laundry Detergent'
@@ -157,7 +157,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Cares_Center_Item__c> getPaperTowel(Id contactId) {
-        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+        return [SELECT Id,Name,Date_Item_was_Received__c,Eligible_for_Item__c
                 FROM Cares_Center_Item__c
                 WHERE Contact__c = :contactId
                 AND Name = 'Paper Towel'
@@ -167,7 +167,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<Cares_Center_Item__c> getToiletPaper(Id contactId) {
-        return [SELECT Name,Date_Item_was_Received__c,Eligible_for_Item__c
+        return [SELECT Id,Name,Date_Item_was_Received__c,Eligible_for_Item__c
                 FROM Cares_Center_Item__c
                 WHERE Contact__c = :contactId
                 AND Name = 'Toilet Paper'

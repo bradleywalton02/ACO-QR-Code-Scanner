@@ -188,10 +188,15 @@ export default class BarcodeScanner extends LightningElement {
             // Check if the data array is empty
             if (data.length == 0) {
                 // If the data array is empty, assign a placeholder row
-                this.laundryDetergentData = [{Name: 'Laundry Detergent'}];
+                this.laundryDetergentData = [{
+                    Id: 'placeholder-laundry-detergent-' + this.scannedBarcode,
+                    Name: 'Laundry Detergent',
+                    Date_Item_was_Received__c: null,
+                    Eligible_for_Item__c: null
+                }];
             } else {
                 // If data is available, assign it to the component property
-                this.laundryDetergentData = data;
+                this.laundryDetergentData = JSON.parse(JSON.stringify(data));
             }
         } else if (error) {
             console.error('Error fetching data:', error);
@@ -205,10 +210,15 @@ export default class BarcodeScanner extends LightningElement {
             // Check if the data array is empty
             if (data.length == 0) {
                 // If the data array is empty, assign a placeholder row
-                this.paperTowelData = [{Name: 'Paper Towel'}];
+                this.paperTowelData = [{
+                    Id: 'placeholder-paper-towel-' + this.scannedBarcode,
+                    Name: 'Paper Towel',
+                    Date_Item_was_Received__c: null,
+                    Eligible_for_Item__c: null
+                }];
             } else {
                 // If data is available, assign it to the component property
-                this.paperTowelData = data;
+                this.paperTowelData = JSON.parse(JSON.stringify(data));
             }
         } else if (error) {
             console.error('Error fetching data:', error);
@@ -222,10 +232,15 @@ export default class BarcodeScanner extends LightningElement {
             // Check if the data array is empty
             if (data.length == 0) {
                 // If the data array is empty, assign a placeholder row
-                this.toiletPaperData = [{Name: 'Toilet Paper'}];
+                this.toiletPaperData = [{
+                    Id: 'placeholder-toilet-paper-' + this.scannedBarcode,
+                    Name: 'Toilet Paper',
+                    Date_Item_was_Received__c: null,
+                    Eligible_for_Item__c: null
+                }];
             } else {
                 // If data is available, assign it to the component property
-                this.toiletPaperData = data;
+                this.toiletPaperData = JSON.parse(JSON.stringify(data));
             }
         } else if (error) {
             console.error('Error fetching data:', error);
@@ -315,12 +330,7 @@ export default class BarcodeScanner extends LightningElement {
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
         this.caresCenterCheckedOut = false;
-        setTimeout(() => {
-            this.laundryDetergentData = [];
-            this.paperTowelData = [];
-            this.toiletPaperData = [];
-            this.selectedRows = [];
-        }, 2000);
+        this.selectedRows = [];
         this.totalAmount = 0;
         this.poundsValue = '';
         this.isSuspended = false;
@@ -602,12 +612,7 @@ export default class BarcodeScanner extends LightningElement {
             this.scannedBarcode = contact.Contact_ID__c;
             this.name = contact.Contact_Name__c;
             this.caresCenterCheckedOut = false; 
-            setTimeout(() => {
-                this.laundryDetergentData = [];
-                this.paperTowelData = [];
-                this.toiletPaperData = [];
-                this.selectedRows = [];
-            }, 2000);
+            this.selectedRows = [];
             this.totalAmount = 0;
         }
     }
