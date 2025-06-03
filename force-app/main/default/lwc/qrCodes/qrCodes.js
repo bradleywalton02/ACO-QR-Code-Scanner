@@ -625,6 +625,7 @@ export default class BarcodeScanner extends LightningElement {
             this.scannedBarcode = contact.Contact_ID__c;
             this.name = contact.Contact_Name__c;
             this.foodPantryAssistanceCreated = false;
+            this.summerFoodAssistanceCreated = false;
             this.poundsValue = '';
         }
     }
