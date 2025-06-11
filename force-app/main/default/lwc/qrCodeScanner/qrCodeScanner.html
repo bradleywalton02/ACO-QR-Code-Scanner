@@ -80,26 +80,26 @@
 
     <template if:true={foodPantryVal}>
         <lightning-datatable
-        key-field="Id" data={dateFP.data} columns={columns1}>
+        key-field="Id" data={foodPantryDateResult.data} columns={foodPantryDateColumns}>
         </lightning-datatable>
     </template>
 
     <template if:true={foodPantryVal}>
         <lightning-datatable
-        key-field="Id" data={totalNumberInHousehold.data} columns={columns15}>
+        key-field="Id" data={totalNumberInHouseholdResult.data} columns={householdSizeColumns}>
         </lightning-datatable>
     </template>
 
     <template if:true={foodPantryVal}>
         <lightning-datatable
-        key-field="Id" data={noShowStatus.data} columns={columns16}>
+        key-field="Id" data={noShowStatusResult.data} columns={noShowStatusColumns}>
         </lightning-datatable>
     </template>
 
     <template if:true={foodPantryVal}>
         <template if:true={holidayActive}>
             <lightning-datatable
-            key-field="Id" data={dateHoliday.data} columns={columns2}>
+            key-field="Id" data={holidayFoodDateResult.data} columns={holidayFoodDateColumns}>
             </lightning-datatable>
         </template>
     </template>
@@ -107,7 +107,7 @@
     <template if:true={foodPantryVal}>
         <template if:true={kidsSummerActive}>
             <lightning-datatable
-            key-field="Id" data={dateSummer.data} columns={columns3}>
+            key-field="Id" data={summerFoodDateResult.data} columns={summerFoodDateColumns}>
             </lightning-datatable>
         </template>
     </template>
@@ -115,7 +115,7 @@
     <template if:true={foodPantryVal}>
         <template if:true={kidsSummerActive}>
             <lightning-datatable
-            key-field="Id" data={numberKidsSummerFood.data} columns={columns4}>
+            key-field="Id" data={numberKidsSummerFoodResult.data} columns={numberKidsSummerFoodColumns}>
             </lightning-datatable>
             <br>
         </template>
@@ -123,40 +123,40 @@
 
     <!-- <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={appointmentDateTime.data} columns={columns17}>
+        key-field="Id" data={appointmentDateTimeResult.data} columns={appointmentDateTimeColumns}>
         </lightning-datatable>
     </template> -->
 
     <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={numberKids.data} columns={columns5}>
+        key-field="Id" data={numberKidsNorthPoleResult.data} columns={numberKidsNorthPoleColumns}>
         </lightning-datatable>
     </template>
 
     <template if:true={northPoleVal}>
         <lightning-datatable
-        key-field="Id" data={childInfo.data} columns={columns6}>
+        key-field="Id" data={northPoleChildInfoResult.data} columns={northPoleChildInfoColumns}>
         </lightning-datatable>
     </template>
 
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={dateSchoolSupplies.data} columns={columns7} hide-checkbox-column>
+        key-field="Id" data={schoolSuppliesDateResult.data} columns={schoolSuppliesDateColumns} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={numberBackpacks.data} columns={columns8} hide-checkbox-column>
+        key-field="Id" data={numberKidsSchoolSuppliesResult.data} columns={numberKidsSchoolSuppliesColumns} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={childInfoSS.data} columns={columns9}>
+        key-field="Id" data={schoolSuppliesChildInfoResult.data} columns={schoolSuppliesChildInfoColumns}>
         </lightning-datatable>
     </template>
     <!-- <template if:true={schoolSuppliesVal}>
         <lightning-datatable
-        key-field="Id" data={schoolSuppliesBalance.data} columns={columns9} hide-checkbox-column>
+        key-field="Id" data={schoolSuppliesBalanceResult.data} columns={schoolSuppliesBalanceColumns} hide-checkbox-column>
         </lightning-datatable>
     </template>
     <template if:true={schoolSuppliesVal}>
@@ -180,31 +180,31 @@
 
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={dateCaresCenter.data} columns={columns10} hide-checkbox-column>
+        key-field="Id" data={caresCenterDateResult.data} columns={caresCenterDateColumns} hide-checkbox-column>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={laundryDetergentData} columns={columns11} onrowselection={handleRowSelection}>
+        key-field="Id" data={laundryDetergentData} columns={laundryDetergentColumns} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={paperTowelData} columns={columns12} onrowselection={handleRowSelection}>
+        key-field="Id" data={paperTowelData} columns={paperTowelColumns} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={toiletPaperData} columns={columns13} onrowselection={handleRowSelection}>
+        key-field="Id" data={toiletPaperData} columns={toiletPaperColumns} onrowselection={handleRowSelection}>
         </lightning-datatable>
         <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={caresCardBalance.data} columns={columns14} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
+        key-field="Id" data={caresCardBalanceResult.data} columns={caresCardBalanceColumns} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
         </lightning-datatable>
         <br>
     </template>

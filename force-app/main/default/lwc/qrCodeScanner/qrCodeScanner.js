@@ -1,21 +1,19 @@
 import { LightningElement, wire, track } from 'lwc';
 import { getRecord, getFieldValue, updateRecord } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
-import NAME_FIELD from '@salesforce/schema/Contact.Name';
+import CONTACT_NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
-import DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
-import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
-import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
-import CHILD_AGE from '@salesforce/schema/Holiday__c.Child_Age__c';
-import CHILD_GENDER from '@salesforce/schema/Holiday__c.Gender__c';
-import CHILD_NAME_SS from '@salesforce/schema/SS_Child__C.Child_Name__c';
-import CHILD_AGE_SS from '@salesforce/schema/SS_Child__C.Child_Age__c';
-import CHILD_GENDER_SS from '@salesforce/schema/SS_Child__C.Child_Gender__c';
-import CHILD_GRADE_SS from '@salesforce/schema/SS_Child__C.Child_Grade__c';
-// import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
-// import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
-import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_School_Supplies__c';
-import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
+import ASSISTANCE_DATE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Date_of_Assistance__c';
+import NUMBER_KIDS_NP_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_Toys__c';
+import CHILD_NAME_NP_FIELD from '@salesforce/schema/Holiday__c.Child_Name__c';
+import CHILD_AGE_NP_FIELD from '@salesforce/schema/Holiday__c.Child_Age__c';
+import CHILD_GENDER_NP_FIELD from '@salesforce/schema/Holiday__c.Gender__c';
+import CHILD_NAME_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Name__c';
+import CHILD_AGE_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Age__c';
+import CHILD_GENDER_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Gender__c';
+import CHILD_GRADE_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Grade__c';
+import NUMBER_KIDS_SS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_School_Supplies__c';
+import NUMBER_KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
 import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eligible_for_Food_Pantry_Shopping__c';
 import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
@@ -54,88 +52,6 @@ import getScannedContacts from '@salesforce/apex/createAssistance.getScannedCont
 import createScannedContact from '@salesforce/apex/createAssistance.createScannedContact';
 import deleteScannedContact from '@salesforce/apex/createAssistance.deleteScannedContact';
 
-const COLUMNS1 = [
-    {label: 'Last Date of Food Pantry Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
-    {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS2 = [
-    {label: 'Last Date of Holiday Food Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS3 = [
-    {label: 'Last Date of Summer Food Assistance', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS4 = [
-    {label: '# Kids for Summer Food', fieldName: KIDS_SUMMER_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS5 = [
-    {label: '# Kids For North Pole', fieldName: KIDS_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS6 = [
-    {label: 'Name of Child', fieldName: CHILD_NAME.fieldApiName, type: 'text'},
-    {label: 'Age', fieldName: CHILD_AGE.fieldApiName, type: 'text'},
-    {label: 'Gender', fieldName: CHILD_GENDER.fieldApiName, type: 'text'}
-];
-
-const COLUMNS7 = [
-    {label: 'Last School Supplies Application', fieldName: DATE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS8 = [
-    {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
-];
-
-// const COLUMNS9 = [
-//     {label: 'School Supplies Balance', fieldName: SPECIAL_EVENT_BALANCE_FIELD.fieldApiName, type: 'text'}
-// ];
-
-const COLUMNS9 = [
-    {label: 'Name of Child', fieldName: CHILD_NAME_SS.fieldApiName, type: 'text'},
-    {label: 'Age', fieldName: CHILD_AGE_SS.fieldApiName, type: 'text'},
-    {label: 'Grade', fieldName: CHILD_GRADE_SS.fieldApiName, type: 'text'},
-    {label: 'Gender', fieldName: CHILD_GENDER_SS.fieldApiName, type: 'text'}
-];
-
-const COLUMNS10 = [
-    {label: 'Cares Center Visits This Month', fieldName: DATE_FIELD.fieldApiName, type: 'text'},
-    {label: 'No Show', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS11 = [
-    {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS12 = [
-    {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS13 = [
-    {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-    {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS14 = [
-    {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
-];
-
-const COLUMNS15 = [
-    {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS16 = [
-    {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
-];
-
-const COLUMNS17 = [
-    {label: 'Appointment Date/Time', fieldName: APPOINTMENT_DATE_TIME_FIELD.fieldApiName, type: 'text'}
-];
-
 export default class BarcodeScanner extends LightningElement {
     myScanner;
     scanButtonDisabled = false;
@@ -154,51 +70,83 @@ export default class BarcodeScanner extends LightningElement {
     nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
     nameOfCampaignSS = 'School Supplies ' + this.currentYear + ' Sign Ups'
 
-    columns1 = COLUMNS1;
+    foodPantryDateColumns = [
+        {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
-    dateFP;
+    foodPantryDateResult;
 
-    columns2 = COLUMNS2;
+    holidayFoodDateColumns = [
+        {label: 'Last Date of Holiday Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
-    dateHoliday;
+    holidayFoodDateResult;
 
-    columns3 = COLUMNS3;
+    summerFoodDateColumns = [
+        {label: 'Last Date of Summer Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
-    dateSummer;
+    summerFoodDateResult;
 
-    columns4 = COLUMNS4;
+    numberKidsSummerFoodColumns = [
+        {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_SUMMER_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getKidsForSummerFood, {contactId : '$scannedBarcode'})
-    numberKidsSummerFood;
+    numberKidsSummerFoodResult;
 
-    columns5 = COLUMNS5;
+    numberKidsNorthPoleColumns = [
+        {label: '# Kids For North Pole', fieldName: NUMBER_KIDS_NP_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
-    numberKids;
+    numberKidsNorthPoleResult;
     
-    columns6 = COLUMNS6;
+    northPoleChildInfoColumns = [
+        {label: 'Name of Child', fieldName: CHILD_NAME_NP_FIELD.fieldApiName, type: 'text'},
+        {label: 'Age', fieldName: CHILD_AGE_NP_FIELD.fieldApiName, type: 'text'},
+        {label: 'Gender', fieldName: CHILD_GENDER_NP_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
-    childInfo;
+    northPoleChildInfoResult;
 
-    columns7 = COLUMNS7;
+    schoolSuppliesDateColumns = [
+        {label: 'Last School Supplies Application', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
-    dateSchoolSupplies;
+    schoolSuppliesDateResult;
 
-    columns8 = COLUMNS8;
+    numberKidsSchoolSuppliesColumns = [
+        {label: '# Kids For School Supplies', fieldName: NUMBER_KIDS_SS_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
-    numberBackpacks;
+    numberKidsSchoolSuppliesResult;
 
-    columns9 = COLUMNS9;
+    schoolSuppliesChildInfoColumns = [
+        {label: 'Name of Child', fieldName: CHILD_NAME_SS_FIELD.fieldApiName, type: 'text'},
+        {label: 'Age', fieldName: CHILD_AGE_SS_FIELD.fieldApiName, type: 'text'},
+        {label: 'Grade', fieldName: CHILD_GRADE_SS_FIELD.fieldApiName, type: 'text'},
+        {label: 'Gender', fieldName: CHILD_GENDER_SS_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getChildInfoSS, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
-    childInfoSS;
+    schoolSuppliesChildInfoResult;
 
-    // columns9 = COLUMNS9;
+    // schoolSuppliesBalanceColumns = [
+    //     {label: 'School Supplies Balance', fieldName: SPECIAL_EVENT_BALANCE_FIELD.fieldApiName, type: 'text'}
+    // ];
     // @wire(getSpecialEventBalance, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
-    // schoolSuppliesBalance;
+    // schoolSuppliesBalanceResult;
 
-    columns10 = COLUMNS10;
+    caresCenterDateColumns = [
+        {label: 'Cares Center Visits This Month', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'No Show', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getCaresCenterDates, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
-    dateCaresCenter;
+    caresCenterDateResult;
 
-    columns11 = COLUMNS11;
+    laundryDetergentColumns = [
+        {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getLaundryDetergent, {contactId : '$scannedBarcode'})
     laundryDetergent({error, data}) {
         if (data) {
@@ -220,7 +168,10 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
-    columns12 = COLUMNS12;
+    paperTowelColumns = [
+        {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getPaperTowel, {contactId : '$scannedBarcode'})
     paperTowel({error, data}) {
         if (data) {
@@ -242,7 +193,10 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
-    columns13 = COLUMNS13;
+    toiletPaperColumns = [
+        {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getToiletPaper, {contactId : '$scannedBarcode'})
     toiletPaper({error, data}) {
         if (data) {
@@ -264,45 +218,53 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
-    columns14 = COLUMNS14;
+    caresCardBalanceColumns = [
+        {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
+    ];
     @wire(getCaresCardBalance, {contactId : '$scannedBarcode'})
-    caresCardBalance;
+    caresCardBalanceResult;
 
-    columns15 = COLUMNS15;
+    householdSizeColumns = [
+        {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
-    totalNumberInHousehold;
+    totalNumberInHouseholdResult;
 
-    columns16 = COLUMNS16;
+    noShowStatusColumns = [
+        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
-    noShowStatus;
+    noShowStatusResult;
 
-    columns17 = COLUMNS17;
+    appointmentDateTimeColumns = [
+        {label: 'Appointment Date/Time', fieldName: APPOINTMENT_DATE_TIME_FIELD.fieldApiName, type: 'text'}
+    ];
     @wire(getAppointmentDateTime, {contactId : '$scannedBarcode', subject: 'North Pole - Calendly'})
-    appointmentDateTime;
+    appointmentDateTimeResult;
 
-    @wire(getRecord, {recordId : '$scannedBarcode', fields: [NAME_FIELD, CLIENTID_FIELD]})
+    @wire(getRecord, {recordId : '$scannedBarcode', fields: [CONTACT_NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {
         if (data) {
             this.contact = data;
             this.clientid = getFieldValue(data, CLIENTID_FIELD);
-            this.name = getFieldValue(data, NAME_FIELD);
+            this.name = getFieldValue(data, CONTACT_NAME_FIELD);
         } else if (error) {
             console.error('Error retrieving contact data: ', error);
         }
     }
 
     @wire(getScannedContacts, {eventType: 'Cares Center'})
-    wiredScannedContactsCares;
+    wiredScannedContactsCaresResult;
     
     @wire(getScannedContacts, {eventType: 'Food Pantry'})
-    wiredScannedContactsFood;
+    wiredScannedContactsFoodResult;
 
     get caresScannedContacts() {
-        return this.wiredScannedContactsCares?.data || [];
+        return this.wiredScannedContactsCaresResult?.data || [];
     }
     
     get foodScannedContacts() {
-        return this.wiredScannedContactsFood?.data || [];
+        return this.wiredScannedContactsFoodResult?.data || [];
     }
 
     @track foodPantryVal = false;
@@ -380,7 +342,7 @@ export default class BarcodeScanner extends LightningElement {
                             createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Cares Center'})
                                 .then(() => {
                                     // Refresh the data after creation
-                                    return refreshApex(this.wiredScannedContactsCares);
+                                    return refreshApex(this.wiredScannedContactsCaresResult);
                                 })
                                 .catch(error => console.error('Error creating Scanned Contact:', error));
                         }, 2000);
@@ -391,7 +353,7 @@ export default class BarcodeScanner extends LightningElement {
                             createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Food Pantry'})
                                 .then(() => {
                                     // Refresh the data after creation
-                                    return refreshApex(this.wiredScannedContactsFood);
+                                    return refreshApex(this.wiredScannedContactsFoodResult);
                                 })
                                 .catch(error => console.error('Error creating Scanned Contact:', error));
                         }, 2000);
@@ -504,7 +466,7 @@ export default class BarcodeScanner extends LightningElement {
             deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Food Pantry'})
                 .then(() => {
                     // Refresh the data after deletion
-                    return refreshApex(this.wiredScannedContactsFood);
+                    return refreshApex(this.wiredScannedContactsFoodResult);
                 })
                 .catch(error => console.error('Error deleting Scanned Contact:', error));
     
@@ -600,7 +562,7 @@ export default class BarcodeScanner extends LightningElement {
         deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
             .then(() => {
                 // Refresh the data after deletion
-                return refreshApex(this.wiredScannedContactsCares);
+                return refreshApex(this.wiredScannedContactsCaresResult);
             })
             .catch(error => console.error('Error deleting Scanned Contact:', error));
 
@@ -611,7 +573,7 @@ export default class BarcodeScanner extends LightningElement {
         deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Food Pantry'})
         .then(() => {
             // Refresh the data after deletion
-            return refreshApex(this.wiredScannedContactsFood);
+            return refreshApex(this.wiredScannedContactsFoodResult);
         })
         .catch(error => console.error('Error deleting Scanned Contact:', error));
     }
@@ -620,7 +582,7 @@ export default class BarcodeScanner extends LightningElement {
         deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
         .then(() => {
             // Refresh the data after deletion
-            return refreshApex(this.wiredScannedContactsCares);
+            return refreshApex(this.wiredScannedContactsCaresResult);
         })
         .catch(error => console.error('Error deleting Scanned Contact:', error));
     }
@@ -774,11 +736,11 @@ export default class BarcodeScanner extends LightningElement {
     }
 
     handleRefreshFood() {
-        refreshApex(this.wiredScannedContactsFood);
+        refreshApex(this.wiredScannedContactsFoodResult);
     }
 
     handleRefreshCares() {
-        refreshApex(this.wiredScannedContactsCares);
+        refreshApex(this.wiredScannedContactsCaresResult);
     }
 
     // This function is used to refresh the table once data updated
