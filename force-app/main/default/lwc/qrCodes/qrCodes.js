@@ -8,16 +8,20 @@ import KIDS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_
 import CHILD_NAME from '@salesforce/schema/Holiday__c.Child_Name__c';
 import CHILD_AGE from '@salesforce/schema/Holiday__c.Child_Age__c';
 import CHILD_GENDER from '@salesforce/schema/Holiday__c.Gender__c';
+import CHILD_NAME_SS from '@salesforce/schema/SS_Child__C.Child_Name__c';
+import CHILD_AGE_SS from '@salesforce/schema/SS_Child__C.Child_Age__c';
+import CHILD_GENDER_SS from '@salesforce/schema/SS_Child__C.Child_Gender__c';
+import CHILD_GRADE_SS from '@salesforce/schema/SS_Child__C.Child_Grade__c';
 // import ELIGIBLE_FIELD from '@salesforce/schema/Holiday__c.Eligible_for_Bike__c';
 // import BIKE_FIELD from '@salesforce/schema/Holiday__c.Date_Bike_was_Received__c';
-import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Backpack_with_School_Supplies_Given__c';
+import BACKPACKS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_School_Supplies__c';
 import KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
 import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eligible_for_Food_Pantry_Shopping__c';
 import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
 import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
-import SPECIAL_EVENT_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Special_Event_Balance__c';
+// import SPECIAL_EVENT_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Special_Event_Balance__c';
 import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
 import APPOINTMENT_DATE_TIME_FIELD from '@salesforce/schema/Event.Event_Start_Date_Time_as_Text__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -32,6 +36,7 @@ import checkDate from '@salesforce/apex/createAssistance.checkDate';
 import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
 import getTotalNumberInHousehold from '@salesforce/apex/createAssistance.getTotalNumberInHousehold';
 import getChildInfo from '@salesforce/apex/createAssistance.getChildInfo';
+import getChildInfoSS from '@salesforce/apex/createAssistance.getChildInfoSS';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 import getKidsForSummerFood from '@salesforce/apex/createAssistance.getKidsForSummerFood';
 import getLaundryDetergent from '@salesforce/apex/createAssistance.getLaundryDetergent';
@@ -40,8 +45,8 @@ import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
 import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
 import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
 import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCenterDates';
-import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecialEventBalance';
-import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
+// import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecialEventBalance';
+// import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
 import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
@@ -84,8 +89,15 @@ const COLUMNS8 = [
     {label: '# Kids For School Supplies', fieldName: BACKPACKS_FIELD.fieldApiName, type: 'text'}
 ];
 
+// const COLUMNS9 = [
+//     {label: 'School Supplies Balance', fieldName: SPECIAL_EVENT_BALANCE_FIELD.fieldApiName, type: 'text'}
+// ];
+
 const COLUMNS9 = [
-    {label: 'School Supplies Balance', fieldName: SPECIAL_EVENT_BALANCE_FIELD.fieldApiName, type: 'text'}
+    {label: 'Name of Child', fieldName: CHILD_NAME_SS.fieldApiName, type: 'text'},
+    {label: 'Age', fieldName: CHILD_AGE_SS.fieldApiName, type: 'text'},
+    {label: 'Grade', fieldName: CHILD_GRADE_SS.fieldApiName, type: 'text'},
+    {label: 'Gender', fieldName: CHILD_GENDER_SS.fieldApiName, type: 'text'}
 ];
 
 const COLUMNS10 = [
@@ -140,6 +152,7 @@ export default class BarcodeScanner extends LightningElement {
     kidsSummerActive = (this.currentMonth == 6 || this.currentMonth == 7 || this.currentMonth == 8);
     currentYear = new Date().getFullYear();
     nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
+    nameOfCampaignSS = 'School Supplies ' + this.currentYear + ' Sign Ups'
 
     columns1 = COLUMNS1;
     @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
@@ -174,8 +187,12 @@ export default class BarcodeScanner extends LightningElement {
     numberBackpacks;
 
     columns9 = COLUMNS9;
-    @wire(getSpecialEventBalance, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
-    schoolSuppliesBalance;
+    @wire(getChildInfoSS, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
+    childInfoSS;
+
+    // columns9 = COLUMNS9;
+    // @wire(getSpecialEventBalance, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    // schoolSuppliesBalance;
 
     columns10 = COLUMNS10;
     @wire(getCaresCenterDates, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
@@ -352,6 +369,10 @@ export default class BarcodeScanner extends LightningElement {
                     if (this.northPoleVal) {
                         updateNorthPoleAssistance({contactId : this.scannedBarcode});
                         this.northPoleAssistanceUpdated = true;
+                    }
+                    if (this.schoolSuppliesVal) {
+                        updateSchoolSuppliesAssistance({contactId : this.scannedBarcode});
+                        this.schoolSuppliesAssistanceUpdated = true;
                     }
                     if (this.caresCenterVal) {
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});

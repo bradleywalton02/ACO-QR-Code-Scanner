@@ -118,25 +118,42 @@ private class createAssistanceTest {
     }
 
     @isTest
-    static void testGetSpecialEventBalance() {
+    static void testGetChildInfoSS() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
-
-        // Call the method to be tested within a try-catch block
-        try {
-            List<c4g_Client_Assistance__c> result = createAssistance.getSpecialEventBalance(testContact.Id, '012390000006CF1AAM');
-            
-            // Perform assertions
-            System.assertNotEquals(null, result, 'Result should not be null');
-        } catch(System.QueryException e) {
-            // Handle the case where no records are found
-            System.debug('No records found for the query: ' + e.getMessage());
-        }
-
+        
+        // Call the method to be tested
+        List<SS_Child__c> result = createAssistance.getChildInfoSS(testContact.Id, 'School Supplies ' + date.today().year() + ' Sign Ups');
+        
+        // Perform assertions
+        System.assertNotEquals(null, result, 'Result should not be null');
+        // Add more assertions as per your requirements
+        
         // Clean up
         delete testContact;
     }
+
+    // @isTest
+    // static void testGetSpecialEventBalance() {
+    //     // Test data setup
+    //     Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+    //     insert testContact;
+
+    //     // Call the method to be tested within a try-catch block
+    //     try {
+    //         List<c4g_Client_Assistance__c> result = createAssistance.getSpecialEventBalance(testContact.Id, '012390000006CF1AAM');
+            
+    //         // Perform assertions
+    //         System.assertNotEquals(null, result, 'Result should not be null');
+    //     } catch(System.QueryException e) {
+    //         // Handle the case where no records are found
+    //         System.debug('No records found for the query: ' + e.getMessage());
+    //     }
+
+    //     // Clean up
+    //     delete testContact;
+    // }
 
     @isTest
     static void testGetCaresCenterDates() {

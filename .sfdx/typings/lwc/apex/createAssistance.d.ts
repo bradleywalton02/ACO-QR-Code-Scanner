@@ -16,8 +16,8 @@ declare module "@salesforce/apex/createAssistance.getChildInfo" {
 declare module "@salesforce/apex/createAssistance.getNumberBackpacks" {
   export default function getNumberBackpacks(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getSpecialEventBalance" {
-  export default function getSpecialEventBalance(param: {contactId: any, recordTypeId: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getChildInfoSS" {
+  export default function getChildInfoSS(param: {contactId: any, campaignName: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.getNoShowStatus" {
   export default function getNoShowStatus(param: {contactId: any, recordTypeId: any}): Promise<any>;

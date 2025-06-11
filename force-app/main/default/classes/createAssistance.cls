@@ -49,7 +49,7 @@ public with sharing class createAssistance {
 
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNumberBackpacks(Id contactId, Id recordTypeId) {
-        return [SELECT of_Backpack_with_School_Supplies_Given__c
+        return [SELECT of_Children_Receiving_School_Supplies__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId
                 AND RecordTypeId = :recordTypeId
@@ -58,14 +58,24 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<c4g_Client_Assistance__c> getSpecialEventBalance(Id contactId, Id recordTypeId) {
-        return [SELECT Special_Event_Balance__c
-                FROM c4g_Client_Assistance__c
-                WHERE c4g_Client__c = :contactId
-                AND RecordTypeId = :recordTypeId
-                ORDER BY Date_of_Assistance__c
-                DESC LIMIT 1];
+    public static List<SS_Child__C> getChildInfoSS(Id contactId, String campaignName) {
+        return [SELECT Child_Name__c,Child_Age__c,Child_Grade__C,Child_Gender__C
+                FROM SS_Child__C
+                WHERE Contact__c = :contactId
+                AND Campaign_Name__c = :campaignName
+                ORDER BY Child_Age__c
+                DESC];
     }
+
+    // @AuraEnabled(cacheable=true)
+    // public static List<c4g_Client_Assistance__c> getSpecialEventBalance(Id contactId, Id recordTypeId) {
+    //     return [SELECT Special_Event_Balance__c
+    //             FROM c4g_Client_Assistance__c
+    //             WHERE c4g_Client__c = :contactId
+    //             AND RecordTypeId = :recordTypeId
+    //             ORDER BY Date_of_Assistance__c
+    //             DESC LIMIT 1];
+    // }
 
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNoShowStatus(Id contactId, Id recordTypeId) {

@@ -151,6 +151,11 @@
     </template>
     <template if:true={schoolSuppliesVal}>
         <lightning-datatable
+        key-field="Id" data={childInfoSS.data} columns={columns9}>
+        </lightning-datatable>
+    </template>
+    <!-- <template if:true={schoolSuppliesVal}>
+        <lightning-datatable
         key-field="Id" data={schoolSuppliesBalance.data} columns={columns9} hide-checkbox-column>
         </lightning-datatable>
     </template>
@@ -171,7 +176,7 @@
         type="number" step="any" label="Subtract from Total" onkeyup={handleKeyUpSubtract} onblur={handleSubtractFromTotal} data-id="priceInputSubtract" hide-checkbox-column>
         </lightning-input>
         <br>
-    </template>
+    </template> -->
 
     <template if:true={caresCenterVal}>
         <lightning-datatable
@@ -296,7 +301,15 @@
             </template>
             <br><br><br>
         </template>
-        <template if:true={schoolSuppliesVal}>
+                <template if:true={schoolSuppliesVal}>
+            <template if:true={schoolSuppliesAssistanceUpdated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">School Supplies Checked In</span>
+                </div>
+            </template>
+            <br><br><br>
+        </template>
+        <!-- <template if:true={schoolSuppliesVal}>
             <template if:false={schoolSuppliesAssistanceUpdated}>
                 <div class="slds-align_absolute-center slds-m-vertical_large">
                     <lightning-button
@@ -328,7 +341,7 @@
                 </lightning-button>
             </div>
         <br><br><br>
-        </template>
+        </template> -->
         <template if:true={caresCenterVal}>
             <template if:false={caresCenterCheckedOut}>
                 <div class="slds-align_absolute-center slds-m-vertical_large">
