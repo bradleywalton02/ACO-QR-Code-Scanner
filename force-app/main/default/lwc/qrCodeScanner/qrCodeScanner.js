@@ -19,7 +19,6 @@ import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eli
 import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
 import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
-// import SPECIAL_EVENT_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Special_Event_Balance__c';
 import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
 import APPOINTMENT_DATE_TIME_FIELD from '@salesforce/schema/Event.Event_Start_Date_Time_as_Text__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -30,21 +29,19 @@ import createCaresCenterItem from '@salesforce/apex/createAssistance.createCares
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import updateSeminarAssistance from '@salesforce/apex/createAssistance.updateSeminarAssistance';
-import checkDate from '@salesforce/apex/createAssistance.checkDate';
-import getNumberKids from '@salesforce/apex/createAssistance.getNumberKids';
+import getLastAssistanceDate from '@salesforce/apex/createAssistance.getLastAssistanceDate';
+import getNumberKidsForNorthPole from '@salesforce/apex/createAssistance.getNumberKidsForNorthPole';
 import getTotalNumberInHousehold from '@salesforce/apex/createAssistance.getTotalNumberInHousehold';
-import getChildInfo from '@salesforce/apex/createAssistance.getChildInfo';
-import getChildInfoSS from '@salesforce/apex/createAssistance.getChildInfoSS';
+import getNorthPoleChildInfo from '@salesforce/apex/createAssistance.getNorthPoleChildInfo';
+import getSchoolSuppliesChildInfo from '@salesforce/apex/createAssistance.getSchoolSuppliesChildInfo';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
-import getKidsForSummerFood from '@salesforce/apex/createAssistance.getKidsForSummerFood';
+import getNumberKidsForSummerFood from '@salesforce/apex/createAssistance.getNumberKidsForSummerFood';
 import getLaundryDetergent from '@salesforce/apex/createAssistance.getLaundryDetergent';
 import getPaperTowel from '@salesforce/apex/createAssistance.getPaperTowel';
 import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
 import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
 import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
 import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCenterDates';
-// import getSpecialEventBalance from '@salesforce/apex/createAssistance.getSpecialEventBalance';
-// import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
 import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
@@ -54,8 +51,13 @@ import deleteScannedContact from '@salesforce/apex/createAssistance.deleteScanne
 
 export default class BarcodeScanner extends LightningElement {
     myScanner;
-    scanButtonDisabled = false;
+
     scannedBarcode = '';
+    contact;
+    contactName;
+    clientid;
+    isSuspended = false;
+
     foodPantryAssistanceCreated = false;
     holidayFoodAssistanceCreated = false;
     summerFoodAssistanceCreated = false;
@@ -63,42 +65,64 @@ export default class BarcodeScanner extends LightningElement {
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
     caresCenterCheckedOut = false;
+
+    scanButtonDisabled = false;
+    isCreateFoodButtonDisabled = false;
+
     currentMonth = new Date().getMonth() + 1;
+    currentYear = new Date().getFullYear();
     holidayActive = (this.currentMonth == 11 || this.currentMonth == 12);
     kidsSummerActive = (this.currentMonth == 6 || this.currentMonth == 7 || this.currentMonth == 8);
-    currentYear = new Date().getFullYear();
     nameOfCampaign = 'North Pole ' + this.currentYear + ' Sign Ups'
     nameOfCampaignSS = 'School Supplies ' + this.currentYear + ' Sign Ups'
+
+    foodPantryVal = false;
+    northPoleVal = false;
+    schoolSuppliesVal = false;
+    caresCenterVal = false;
+    learningAcademyVal = false;
+
+    totalAmount = 0;
+    selectedRows = [];
+    laundryDetergentData = [];
+    paperTowelData = [];
+    toiletPaperData = [];
+    poundsValue;
+
+    selectedItemValue;
+    workshopType;
+    workshopName;
+    saveDraftValues = [];
 
     foodPantryDateColumns = [
         {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
         {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
+    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
     foodPantryDateResult;
 
     holidayFoodDateColumns = [
         {label: 'Last Date of Holiday Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
+    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
     holidayFoodDateResult;
 
     summerFoodDateColumns = [
         {label: 'Last Date of Summer Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
+    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
     summerFoodDateResult;
 
     numberKidsSummerFoodColumns = [
         {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_SUMMER_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getKidsForSummerFood, {contactId : '$scannedBarcode'})
+    @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
     numberKidsSummerFoodResult;
 
     numberKidsNorthPoleColumns = [
         {label: '# Kids For North Pole', fieldName: NUMBER_KIDS_NP_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getNumberKids, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
+    @wire(getNumberKidsForNorthPole, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
     numberKidsNorthPoleResult;
     
     northPoleChildInfoColumns = [
@@ -106,13 +130,13 @@ export default class BarcodeScanner extends LightningElement {
         {label: 'Age', fieldName: CHILD_AGE_NP_FIELD.fieldApiName, type: 'text'},
         {label: 'Gender', fieldName: CHILD_GENDER_NP_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
+    @wire(getNorthPoleChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
     northPoleChildInfoResult;
 
     schoolSuppliesDateColumns = [
         {label: 'Last School Supplies Application', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(checkDate, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     schoolSuppliesDateResult;
 
     numberKidsSchoolSuppliesColumns = [
@@ -127,7 +151,7 @@ export default class BarcodeScanner extends LightningElement {
         {label: 'Grade', fieldName: CHILD_GRADE_SS_FIELD.fieldApiName, type: 'text'},
         {label: 'Gender', fieldName: CHILD_GENDER_SS_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getChildInfoSS, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
+    @wire(getSchoolSuppliesChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
     schoolSuppliesChildInfoResult;
 
     // schoolSuppliesBalanceColumns = [
@@ -247,7 +271,7 @@ export default class BarcodeScanner extends LightningElement {
         if (data) {
             this.contact = data;
             this.clientid = getFieldValue(data, CLIENTID_FIELD);
-            this.name = getFieldValue(data, CONTACT_NAME_FIELD);
+            this.contactName = getFieldValue(data, CONTACT_NAME_FIELD);
         } else if (error) {
             console.error('Error retrieving contact data: ', error);
         }
@@ -266,30 +290,6 @@ export default class BarcodeScanner extends LightningElement {
     get foodScannedContacts() {
         return this.wiredScannedContactsFoodResult?.data || [];
     }
-
-    @track foodPantryVal = false;
-    @track northPoleVal = false;
-    @track schoolSuppliesVal = false;
-    @track caresCenterVal = false;
-    @track learningAcademyVal = false;
-    @track isCreateFoodButtonDisabled = false;
-    @track selectedRows = [];
-    @track childInfo;
-    @track caresCardBalance;
-    @track totalAmount = 0;
-    @track laundryDetergentData = [];
-    @track paperTowelData = [];
-    @track toiletPaperData = [];
-    @track contact;
-    @track clientid;
-    @track name;
-    @track poundsValue
-    @track isSuspended = false;
-
-    selectedItemValue;
-    workshopType;
-    workshopName;
-    saveDraftValues = [];
 
     // When component is initialized, detect whether to enable Scan button
     connectedCallback() {
@@ -339,7 +339,7 @@ export default class BarcodeScanner extends LightningElement {
                     if (this.caresCenterVal) {
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         setTimeout(() => {
-                            createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Cares Center'})
+                            createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Cares Center'})
                                 .then(() => {
                                     // Refresh the data after creation
                                     return refreshApex(this.wiredScannedContactsCaresResult);
@@ -350,7 +350,7 @@ export default class BarcodeScanner extends LightningElement {
                     }
                     if (this.foodPantryVal) {
                         setTimeout(() => {
-                            createScannedContact({contactId: this.scannedBarcode, contactName: this.name, eventType: 'Food Pantry'})
+                            createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Food Pantry'})
                                 .then(() => {
                                     // Refresh the data after creation
                                     return refreshApex(this.wiredScannedContactsFoodResult);
@@ -593,7 +593,7 @@ export default class BarcodeScanner extends LightningElement {
     
         if (contact) {
             this.scannedBarcode = contact.Contact_ID__c;
-            this.name = contact.Contact_Name__c;
+            this.contactName = contact.Contact_Name__c;
             this.caresCenterCheckedOut = false; 
             this.selectedRows = [];
             this.totalAmount = 0;
@@ -606,7 +606,7 @@ export default class BarcodeScanner extends LightningElement {
     
         if (contact) {
             this.scannedBarcode = contact.Contact_ID__c;
-            this.name = contact.Contact_Name__c;
+            this.contactName = contact.Contact_Name__c;
             this.foodPantryAssistanceCreated = false;
             this.summerFoodAssistanceCreated = false;
             this.poundsValue = '';
@@ -745,8 +745,7 @@ export default class BarcodeScanner extends LightningElement {
 
     // This function is used to refresh the table once data updated
     async refresh() {
-        await refreshApex(this.childInfo);
-        await refreshApex(this.caresCardBalance);
+        await refreshApex(this.caresCardBalanceResult);
         await refreshApex(this.schoolSuppliesBalance);
     }
 }

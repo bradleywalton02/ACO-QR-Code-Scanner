@@ -1,13 +1,13 @@
 @isTest
 private class createAssistanceTest {
     @isTest
-    static void testCheckDate() {
+    static void testGetLastAssistanceDate() {
         //Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
 
         //Call the method to be tested
-        List<c4g_Client_Assistance__c> result = createAssistance.checkDate(testContact.Id, '01239000000EG3lAAG');
+        List<c4g_Client_Assistance__c> result = createAssistance.getLastAssistanceDate(testContact.Id, '01239000000EG3lAAG');
         
         // Perform assertions
         System.assertEquals(0, result.size(), 'No records should be returned initially');
@@ -17,14 +17,14 @@ private class createAssistanceTest {
     }
 
     @isTest
-    static void testGetKidsForSummerFood() {
+    static void testGetNumberKidsForSummerFood() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
 
         // Call the method to be tested within a try-catch block
         try {
-            List<Case> result = createAssistance.getKidsForSummerFood(testContact.Id);
+            List<Case> result = createAssistance.getNumberKidsForSummerFood(testContact.Id);
             
             // Perform assertions
             System.assertNotEquals(null, result, 'Result should not be null');
@@ -59,14 +59,14 @@ private class createAssistanceTest {
     }
     
     @isTest
-    static void testGetNumberKids() {
+    static void testGetNumberKidsForNorthPole() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
 
         // Call the method to be tested within a try-catch block
         try {
-            List<c4g_Client_Assistance__c> result = createAssistance.getNumberKids(testContact.Id, '012390000006CFBAA2');
+            List<c4g_Client_Assistance__c> result = createAssistance.getNumberKidsForNorthPole(testContact.Id, '012390000006CFBAA2');
             
             // Perform assertions
             System.assertNotEquals(null, result, 'Result should not be null');
@@ -80,13 +80,13 @@ private class createAssistanceTest {
     }
     
     @isTest
-    static void testGetChildInfo() {
+    static void testGetNorthPoleChildInfo() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
         
         // Call the method to be tested
-        List<Holiday__c> result = createAssistance.getChildInfo(testContact.Id, 'North Pole ' + date.today().year() + ' Sign Ups');
+        List<Holiday__c> result = createAssistance.getNorthPoleChildInfo(testContact.Id, 'North Pole ' + date.today().year() + ' Sign Ups');
         
         // Perform assertions
         System.assertNotEquals(null, result, 'Result should not be null');
@@ -118,13 +118,13 @@ private class createAssistanceTest {
     }
 
     @isTest
-    static void testGetChildInfoSS() {
+    static void testGetSchoolSuppliesChildInfo() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
         
         // Call the method to be tested
-        List<SS_Child__c> result = createAssistance.getChildInfoSS(testContact.Id, 'School Supplies ' + date.today().year() + ' Sign Ups');
+        List<SS_Child__c> result = createAssistance.getSchoolSuppliesChildInfo(testContact.Id, 'School Supplies ' + date.today().year() + ' Sign Ups');
         
         // Perform assertions
         System.assertNotEquals(null, result, 'Result should not be null');
@@ -133,27 +133,6 @@ private class createAssistanceTest {
         // Clean up
         delete testContact;
     }
-
-    // @isTest
-    // static void testGetSpecialEventBalance() {
-    //     // Test data setup
-    //     Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
-    //     insert testContact;
-
-    //     // Call the method to be tested within a try-catch block
-    //     try {
-    //         List<c4g_Client_Assistance__c> result = createAssistance.getSpecialEventBalance(testContact.Id, '012390000006CF1AAM');
-            
-    //         // Perform assertions
-    //         System.assertNotEquals(null, result, 'Result should not be null');
-    //     } catch(System.QueryException e) {
-    //         // Handle the case where no records are found
-    //         System.debug('No records found for the query: ' + e.getMessage());
-    //     }
-
-    //     // Clean up
-    //     delete testContact;
-    // }
 
     @isTest
     static void testGetCaresCenterDates() {

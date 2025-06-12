@@ -1,23 +1,23 @@
-declare module "@salesforce/apex/createAssistance.checkDate" {
-  export default function checkDate(param: {contactId: any, recordTypeId: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getLastAssistanceDate" {
+  export default function getLastAssistanceDate(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getKidsForSummerFood" {
-  export default function getKidsForSummerFood(param: {contactId: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getNumberKidsForSummerFood" {
+  export default function getNumberKidsForSummerFood(param: {contactId: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.getTotalNumberInHousehold" {
   export default function getTotalNumberInHousehold(param: {contactId: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getNumberKids" {
-  export default function getNumberKids(param: {contactId: any, recordTypeId: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getNumberKidsForNorthPole" {
+  export default function getNumberKidsForNorthPole(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getChildInfo" {
-  export default function getChildInfo(param: {contactId: any, campaignName: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getNorthPoleChildInfo" {
+  export default function getNorthPoleChildInfo(param: {contactId: any, campaignName: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.getNumberBackpacks" {
   export default function getNumberBackpacks(param: {contactId: any, recordTypeId: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getChildInfoSS" {
-  export default function getChildInfoSS(param: {contactId: any, campaignName: any}): Promise<any>;
+declare module "@salesforce/apex/createAssistance.getSchoolSuppliesChildInfo" {
+  export default function getSchoolSuppliesChildInfo(param: {contactId: any, campaignName: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.getNoShowStatus" {
   export default function getNoShowStatus(param: {contactId: any, recordTypeId: any}): Promise<any>;

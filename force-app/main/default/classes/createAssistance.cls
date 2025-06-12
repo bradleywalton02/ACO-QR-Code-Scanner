@@ -1,6 +1,6 @@
 public with sharing class createAssistance {
     @AuraEnabled(cacheable=true)
-    public static List<c4g_Client_Assistance__c> checkDate(Id contactId, Id recordTypeId) {
+    public static List<c4g_Client_Assistance__c> getLastAssistanceDate(Id contactId, Id recordTypeId) {
         return [SELECT Date_of_Assistance__c,Eligible_for_Food_Pantry_Shopping__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId 
@@ -10,7 +10,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<Case> getKidsForSummerFood(Id contactId) {
+    public static List<Case> getNumberKidsForSummerFood(Id contactId) {
         return [SELECT Children_in_Your_Home_0_17__c
                 FROM Case
                 WHERE ContactId = :contactId
@@ -28,7 +28,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<c4g_Client_Assistance__c> getNumberKids(Id contactId, Id recordTypeId) {
+    public static List<c4g_Client_Assistance__c> getNumberKidsForNorthPole(Id contactId, Id recordTypeId) {
         return [SELECT of_Children_Receiving_Toys__c
                 FROM c4g_Client_Assistance__c
                 WHERE c4g_Client__c = :contactId
@@ -38,7 +38,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<Holiday__c> getChildInfo(Id contactId, String campaignName) {
+    public static List<Holiday__c> getNorthPoleChildInfo(Id contactId, String campaignName) {
         return [SELECT Child_Name__c,Child_Age__c,Gender__C
                 FROM Holiday__c
                 WHERE Contact__c = :contactId
@@ -58,7 +58,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<SS_Child__C> getChildInfoSS(Id contactId, String campaignName) {
+    public static List<SS_Child__C> getSchoolSuppliesChildInfo(Id contactId, String campaignName) {
         return [SELECT Child_Name__c,Child_Age__c,Child_Grade__C,Child_Gender__C
                 FROM SS_Child__C
                 WHERE Contact__c = :contactId
@@ -66,16 +66,6 @@ public with sharing class createAssistance {
                 ORDER BY Child_Age__c
                 DESC];
     }
-
-    // @AuraEnabled(cacheable=true)
-    // public static List<c4g_Client_Assistance__c> getSpecialEventBalance(Id contactId, Id recordTypeId) {
-    //     return [SELECT Special_Event_Balance__c
-    //             FROM c4g_Client_Assistance__c
-    //             WHERE c4g_Client__c = :contactId
-    //             AND RecordTypeId = :recordTypeId
-    //             ORDER BY Date_of_Assistance__c
-    //             DESC LIMIT 1];
-    // }
 
     @AuraEnabled(cacheable=true)
     public static List<c4g_Client_Assistance__c> getNoShowStatus(Id contactId, Id recordTypeId) {

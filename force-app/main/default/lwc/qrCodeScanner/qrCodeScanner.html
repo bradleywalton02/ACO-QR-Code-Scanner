@@ -55,7 +55,7 @@
     <div class="slds-var-m-vertical_large slds-var-p-vertical_medium 
          slds-text-align_center slds-border_top slds-border_bottom">
         Client ID and Name:<br/>
-        <span class="slds-text-heading_small">{clientid}<br/>{name}</span>
+        <span class="slds-text-heading_small">{clientid}<br/>{contactName}</span>
     </div>
 
     <template if:true={isSuspended}>
@@ -154,29 +154,6 @@
         key-field="Id" data={schoolSuppliesChildInfoResult.data} columns={schoolSuppliesChildInfoColumns}>
         </lightning-datatable>
     </template>
-    <!-- <template if:true={schoolSuppliesVal}>
-        <lightning-datatable
-        key-field="Id" data={schoolSuppliesBalanceResult.data} columns={schoolSuppliesBalanceColumns} hide-checkbox-column>
-        </lightning-datatable>
-    </template>
-    <template if:true={schoolSuppliesVal}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
-        </div>
-        <br>
-    </template>
-    <template if:true={schoolSuppliesVal}>
-        <lightning-input
-        type="number" step="any" label="Add to Total" onkeyup={handleKeyUpAdd} onblur={handleAddToTotal} data-id="priceInputAdd" hide-checkbox-column>
-        </lightning-input>
-        <br>
-    </template>
-    <template if:true={schoolSuppliesVal}>
-        <lightning-input
-        type="number" step="any" label="Subtract from Total" onkeyup={handleKeyUpSubtract} onblur={handleSubtractFromTotal} data-id="priceInputSubtract" hide-checkbox-column>
-        </lightning-input>
-        <br>
-    </template> -->
 
     <template if:true={caresCenterVal}>
         <lightning-datatable
@@ -309,39 +286,6 @@
             </template>
             <br><br><br>
         </template>
-        <!-- <template if:true={schoolSuppliesVal}>
-            <template if:false={schoolSuppliesAssistanceUpdated}>
-                <div class="slds-align_absolute-center slds-m-vertical_large">
-                    <lightning-button
-                        variant="brand"
-                        class="slds-var-m-left_x-small"
-                        icon-name="action:new"
-                        label="Complete Transaction"
-                        title="Update School Supplies Assistance"
-                        onclick={handleSchoolSuppliesUpdate}>
-                    </lightning-button>
-                </div>
-            </template>
-            <template if:true={schoolSuppliesAssistanceUpdated}>
-                <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Transaction Completed</span>
-                </div>
-            </template>
-            <br><br><br>
-        </template>
-        <template if:true={schoolSuppliesVal}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:refresh"
-                    label="Reset Total Cost"
-                    title="Set Total Amount to $0"
-                    onclick={handleResetTotalAmount}>
-                </lightning-button>
-            </div>
-        <br><br><br>
-        </template> -->
         <template if:true={caresCenterVal}>
             <template if:false={caresCenterCheckedOut}>
                 <div class="slds-align_absolute-center slds-m-vertical_large">
