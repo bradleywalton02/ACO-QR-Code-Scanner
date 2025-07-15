@@ -1,4 +1,4 @@
-import { LightningElement, wire, track } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { getRecord, getFieldValue, updateRecord } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
 import CONTACT_NAME_FIELD from '@salesforce/schema/Contact.Name';
@@ -153,12 +153,6 @@ export default class BarcodeScanner extends LightningElement {
     ];
     @wire(getSchoolSuppliesChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
     schoolSuppliesChildInfoResult;
-
-    // schoolSuppliesBalanceColumns = [
-    //     {label: 'School Supplies Balance', fieldName: SPECIAL_EVENT_BALANCE_FIELD.fieldApiName, type: 'text'}
-    // ];
-    // @wire(getSpecialEventBalance, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
-    // schoolSuppliesBalanceResult;
 
     caresCenterDateColumns = [
         {label: 'Cares Center Visits This Month', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
