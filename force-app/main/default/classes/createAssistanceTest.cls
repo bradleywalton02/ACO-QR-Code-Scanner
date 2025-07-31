@@ -265,7 +265,7 @@ private class createAssistanceTest {
         insert testContact;
 
         // Create a suspension record for the contact within the last 30 days
-        Suspension__c suspension = new Suspension__c(Contact__c = testContact.Id, CreatedDate = System.today().addDays(-10), Location__c = 'Food Pantry');
+        Suspension__c suspension = new Suspension__c(Contact__c = testContact.Id, CreatedDate = System.today().addDays(-10), Location__c = 'Food Pantry', Type__c = '30 Day - Age 64 and Below');
         insert suspension;
 
         // Call the method to check for suspension

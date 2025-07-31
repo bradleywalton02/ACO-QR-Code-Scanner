@@ -207,7 +207,7 @@ public with sharing class createAssistance {
             FROM Suspension__c
             WHERE Contact__c = :contactId
             AND Location__c = :location
-            AND ((CreatedDate >= :last30Days AND X30_Day_Suspension_for_65_Years_Old__c = true) OR (X30_Day_Suspension_for_65_Years_Old__c = false AND Reinstated__c = false) OR Permanent_Suspension__c = true)
+            AND ((CreatedDate >= :last30Days AND Type__c != 'Warning') OR Type__c = 'Permanent' OR (Type__c = '30 Day - Age 64 and Below' AND Reinstated__c = false))
         ];
 
         return suspensionCount > 0;
