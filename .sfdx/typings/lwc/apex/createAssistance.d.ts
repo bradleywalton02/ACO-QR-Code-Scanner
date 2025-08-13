@@ -31,9 +31,6 @@ declare module "@salesforce/apex/createAssistance.createScannedContact" {
 declare module "@salesforce/apex/createAssistance.deleteScannedContact" {
   export default function deleteScannedContact(param: {contactId: any, eventType: any}): Promise<any>;
 }
-declare module "@salesforce/apex/createAssistance.getCaresCenterDates" {
-  export default function getCaresCenterDates(param: {contactId: any, recordTypeId: any}): Promise<any>;
-}
 declare module "@salesforce/apex/createAssistance.getLaundryDetergent" {
   export default function getLaundryDetergent(param: {contactId: any}): Promise<any>;
 }
@@ -45,9 +42,6 @@ declare module "@salesforce/apex/createAssistance.getToiletPaper" {
 }
 declare module "@salesforce/apex/createAssistance.getCaresCardBalance" {
   export default function getCaresCardBalance(param: {contactId: any}): Promise<any>;
-}
-declare module "@salesforce/apex/createAssistance.getAppointmentDateTime" {
-  export default function getAppointmentDateTime(param: {contactId: any, subject: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.isContactSuspended" {
   export default function isContactSuspended(param: {contactId: any, location: any}): Promise<any>;

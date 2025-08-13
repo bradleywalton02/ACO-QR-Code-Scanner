@@ -115,36 +115,6 @@ public with sharing class createAssistance {
         delete matches;
     }
 
-
-    @AuraEnabled(cacheable=true)
-    public static List<c4g_Client_Assistance__c> getCaresCenterDates(Id contactId, Id recordTypeId) {
-        // Get the current month and year
-        Integer currentMonth = Date.today().month();
-        Integer currentYear = Date.today().year();
-    
-        // Calculate the start and end dates of the current month
-        Date startDate = Date.newInstance(currentYear, currentMonth, 1);
-        Date endDate = startDate.addMonths(1).addDays(-1);
-    
-        // Query for the number of assistances in the current month
-        Integer assistancesCount = [SELECT COUNT()
-                                    FROM c4g_Client_Assistance__c
-                                    WHERE c4g_Client__c = :contactId
-                                    AND RecordTypeId = :recordTypeId
-                                    AND Date_of_Assistance__c >= :startDate
-                                    AND Date_of_Assistance__c <= :endDate];
-    
-        // Query for the assistances with the calculated limit
-        return [SELECT Date_of_Assistance__c,No_Show_Formula_for_Scanner__c
-                FROM c4g_Client_Assistance__c
-                WHERE c4g_Client__c = :contactId 
-                AND RecordTypeId = :recordTypeId
-                AND Date_of_Assistance__c >= :startDate
-                AND Date_of_Assistance__c <= :endDate
-                ORDER BY Date_of_Assistance__c
-                DESC LIMIT :assistancesCount];
-    }
-
     @AuraEnabled(cacheable=true)
     public static List<Cares_Center_Item__c> getLaundryDetergent(Id contactId) {
         return [SELECT Id,Name,Date_Item_was_Received__c,Eligible_for_Item__c
@@ -183,18 +153,6 @@ public with sharing class createAssistance {
                 AND RecordTypeId = '0124z000000xUcgAAE'
                 ORDER BY Date_of_Assistance__c
                 DESC LIMIT 1];
-    }
-
-    @AuraEnabled(cacheable=true)
-    public static List<Event> getAppointmentDateTime(Id contactId, String subject) {
-        String likeClause = '%' + subject + '%';
-
-        return [SELECT Event_Start_Date_Time_as_Text__c
-                FROM Event
-                WHERE WhoId = :contactId
-                AND Subject LIKE :likeClause
-                ORDER BY Event_Start_Date_Time_as_Text__c
-                DESC];
     }
 
     @AuraEnabled(cacheable=true)

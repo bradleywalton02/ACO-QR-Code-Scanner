@@ -92,7 +92,7 @@
 
     <template if:true={foodPantryVal}>
         <lightning-datatable
-        key-field="Id" data={noShowStatusResult.data} columns={noShowStatusColumns}>
+        key-field="Id" data={foodNoShowStatusResult.data} columns={foodNoShowStatusColumns}>
         </lightning-datatable>
     </template>
 
@@ -120,12 +120,6 @@
             <br>
         </template>
     </template>
-
-    <!-- <template if:true={northPoleVal}>
-        <lightning-datatable
-        key-field="Id" data={appointmentDateTimeResult.data} columns={appointmentDateTimeColumns}>
-        </lightning-datatable>
-    </template> -->
 
     <template if:true={northPoleVal}>
         <lightning-datatable
@@ -160,6 +154,11 @@
         key-field="Id" data={caresCenterDateResult.data} columns={caresCenterDateColumns} hide-checkbox-column>
         </lightning-datatable>
         <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Id" data={caresNoShowStatusResult.data} columns={caresNoShowStatusColumns}>
+        </lightning-datatable>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable

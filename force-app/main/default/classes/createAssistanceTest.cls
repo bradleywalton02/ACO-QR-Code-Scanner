@@ -135,19 +135,91 @@ private class createAssistanceTest {
     }
 
     @isTest
-    static void testGetCaresCenterDates() {
+    static void testGetNoShowStatus() {
         // Test data setup
         Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
         insert testContact;
 
-        Test.startTest();
-        // Call the method to be tested
-        List<c4g_Client_Assistance__c> result = createAssistance.getCaresCenterDates(testContact.Id, '012Nt000000plo5IAA');
-        Test.stopTest();
+        // Call the method to be tested within a try-catch block
+        try {
+            List<c4g_Client_Assistance__c> result = createAssistance.getNoShowStatus(testContact.Id, '01239000000EG3lAAG');
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
 
-        // Perform assertions
-        System.assertNotEquals(null, result, 'Result should not be null');
-        System.assertEquals(0, result.size(), 'No records should be returned initially');
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
+    static void testGetScannedContacts() {
+        // Call the method to be tested within a try-catch block
+        try {
+            List<Scanned_Contact__c> result = createAssistance.getScannedContacts('Food Pantry');
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+    }
+
+    @isTest
+    static void testCreateScannedContact() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            createAssistance.createScannedContact(testContact.Id, 'Contact Test', 'Food Pantry');
+
+            List<Scanned_Contact__c> result = [
+                SELECT Id, Contact_Name__c
+                FROM Scanned_Contact__c
+                WHERE Contact_ID__c = :testContact.Id
+                AND Event_Type__c = 'Food Pantry'
+            ];
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
+
+        // Clean up
+        delete testContact;
+    }
+
+    @isTest
+    static void testDeleteScannedContact() {
+        // Test data setup
+        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
+        insert testContact;
+
+        // Call the method to be tested within a try-catch block
+        try {
+            createAssistance.deleteScannedContact(testContact.Id, 'Food Pantry');
+
+            List<Scanned_Contact__c> result = [
+                SELECT Id, Contact_Name__c
+                FROM Scanned_Contact__c
+                WHERE Contact_ID__c = :testContact.Id
+                AND Event_Type__c = 'Food Pantry'
+            ];
+            
+            // Perform assertions
+            System.assertNotEquals(null, result, 'Result should not be null');
+        } catch(System.QueryException e) {
+            // Handle the case where no records are found
+            System.debug('No records found for the query: ' + e.getMessage());
+        }
 
         // Clean up
         delete testContact;
@@ -225,27 +297,6 @@ private class createAssistanceTest {
         // Call the method to be tested within a try-catch block
         try {
             List<c4g_Client_Assistance__c> result = createAssistance.getCaresCardBalance(testContact.Id);
-            
-            // Perform assertions
-            System.assertNotEquals(null, result, 'Result should not be null');
-        } catch(System.QueryException e) {
-            // Handle the case where no records are found
-            System.debug('No records found for the query: ' + e.getMessage());
-        }
-
-        // Clean up
-        delete testContact;
-    }
-
-    @isTest
-    static void testGetAppointmentDateTime() {
-        // Test data setup
-        Contact testContact = new Contact(LastName = 'Test', FirstName = 'Contact');
-        insert testContact;
-
-        // Call the method to be tested within a try-catch block
-        try {
-            List<Event> result = createAssistance.getAppointmentDateTime(testContact.Id, 'North Pole - Calendly');
             
             // Perform assertions
             System.assertNotEquals(null, result, 'Result should not be null');

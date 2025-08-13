@@ -20,7 +20,6 @@ import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_w
 import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
 import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
 import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
-import APPOINTMENT_DATE_TIME_FIELD from '@salesforce/schema/Event.Event_Start_Date_Time_as_Text__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
@@ -41,9 +40,7 @@ import getPaperTowel from '@salesforce/apex/createAssistance.getPaperTowel';
 import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
 import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
 import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
-import getCaresCenterDates from '@salesforce/apex/createAssistance.getCaresCenterDates';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
-import getAppointmentDateTime from '@salesforce/apex/createAssistance.getAppointmentDateTime';
 import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
 import getScannedContacts from '@salesforce/apex/createAssistance.getScannedContacts';
 import createScannedContact from '@salesforce/apex/createAssistance.createScannedContact';
@@ -155,10 +152,10 @@ export default class BarcodeScanner extends LightningElement {
     schoolSuppliesChildInfoResult;
 
     caresCenterDateColumns = [
-        {label: 'Cares Center Visits This Month', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'No Show', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last Cares Center Visit', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
+        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getCaresCenterDates, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
+    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
     caresCenterDateResult;
 
     laundryDetergentColumns = [
@@ -248,17 +245,17 @@ export default class BarcodeScanner extends LightningElement {
     @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
     totalNumberInHouseholdResult;
 
-    noShowStatusColumns = [
+    foodNoShowStatusColumns = [
         {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
     ];
     @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
-    noShowStatusResult;
+    foodNoShowStatusResult;
 
-    appointmentDateTimeColumns = [
-        {label: 'Appointment Date/Time', fieldName: APPOINTMENT_DATE_TIME_FIELD.fieldApiName, type: 'text'}
+    caresNoShowStatusColumns = [
+        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
     ];
-    @wire(getAppointmentDateTime, {contactId : '$scannedBarcode', subject: 'North Pole - Calendly'})
-    appointmentDateTimeResult;
+    @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '012Nt000000plo5IAA'})
+    caresNoShowStatusResult;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [CONTACT_NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {
