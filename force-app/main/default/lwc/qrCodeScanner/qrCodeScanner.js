@@ -589,6 +589,14 @@ export default class BarcodeScanner extends LightningElement {
             this.selectedRows = [];
             this.totalAmount = 0;
         }
+
+        isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
+            .then(result => {
+                this.isSuspended = result;
+            })
+            .catch(error => {
+                console.error('Error checking suspension:', error);
+            });
     }
 
     async handleSwitchContactFood(event) {
@@ -602,6 +610,14 @@ export default class BarcodeScanner extends LightningElement {
             this.summerFoodAssistanceCreated = false;
             this.poundsValue = '';
         }
+
+        isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
+            .then(result => {
+                this.isSuspended = result;
+            })
+            .catch(error => {
+                console.error('Error checking suspension:', error);
+            });
     }
 
     handleKeyUpAdd(event) {
