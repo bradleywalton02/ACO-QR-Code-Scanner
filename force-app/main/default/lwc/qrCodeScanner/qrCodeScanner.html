@@ -23,21 +23,22 @@
 
     <template if:true={learningAcademyVal}>
         <div class="slds-p-around_medium lgc-bg">
-            <lightning-button-menu alternative-text="Show menu" variant="border-filled" onselect={handleWorkshopChange}>
+            <lightning-button-menu alternative-text="Show menu" variant="border-filled" onselect={handleSeminarChange}>
                 <lightning-menu-item value="Education Workshop" label="Education Workshop"></lightning-menu-item>
                 <lightning-menu-item value="Employment Workshop" label="Employment Workshop"></lightning-menu-item>
                 <lightning-menu-item value="Financial Workshop" label="Financial Workshop"></lightning-menu-item>
                 <lightning-menu-item value="Wellness Workshop" label="Wellness Workshop"></lightning-menu-item>
+                <lightning-menu-item value="Youth Summer Series" label="Youth Summer Series"></lightning-menu-item>
             </lightning-button-menu>
          
-            <span style=" display:inline-block; margin-left:10px;"><strong> Selected workshop: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{workshopType}</span></span>
+            <span style=" display:inline-block; margin-left:10px;"><strong> Selected seminar: </strong> <span class="slds-text-heading_small" style="color:#ff0000; font-weight:bold;">{seminarType}</span></span>
         </div>
     </template>
 
     <div class="slds-col slds-size_10-of-12">
         <template if:true={learningAcademyVal}>
             <div>
-                <lightning-input type="text" name="workshopName" label="Enter Workshop Name" onchange={handleWorkshopName} ></lightning-input>
+                <lightning-input type="text" name="seminarName" label="Enter Seminar Name" onchange={handleSeminarName} ></lightning-input>
             </div>
         </template>
     </div>

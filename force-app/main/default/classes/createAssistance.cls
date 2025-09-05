@@ -287,7 +287,7 @@ public with sharing class createAssistance {
     }
 
     @AuraEnabled
-    public static c4g_Client_Assistance__c updateSeminarAssistance(Id contactId, String typeOfWorkshop, String workshopName) {
+    public static c4g_Client_Assistance__c updateSeminarAssistance(Id contactId, String typeOfSeminar, String seminarName) {
         c4g_Client_Assistance__c queriedAssistance = [SELECT Seminar__c, Seminar_Attended__c
                                                       FROM c4g_Client_Assistance__c
                                                       WHERE c4g_Client__c = :contactId
@@ -296,8 +296,8 @@ public with sharing class createAssistance {
                                                       ORDER BY Date_of_Assistance__c
                                                       DESC LIMIT 1];
 
-        queriedAssistance.Seminar__c = typeOfWorkshop;
-        queriedAssistance.Seminar_Attended__c = workshopName;
+        queriedAssistance.Seminar__c = typeOfSeminar;
+        queriedAssistance.Seminar_Attended__c = seminarName;
         
         update queriedAssistance;
         return queriedAssistance;

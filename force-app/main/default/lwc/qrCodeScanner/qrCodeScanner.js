@@ -87,8 +87,8 @@ export default class BarcodeScanner extends LightningElement {
     poundsValue;
 
     selectedItemValue;
-    workshopType;
-    workshopName;
+    seminarType;
+    seminarName;
     saveDraftValues = [];
 
     foodPantryDateColumns = [
@@ -328,7 +328,6 @@ export default class BarcodeScanner extends LightningElement {
                         this.schoolSuppliesAssistanceUpdated = true;
                     }
                     if (this.caresCenterVal) {
-                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         setTimeout(() => {
                             createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Cares Center'})
                                 .then(() => {
@@ -337,6 +336,7 @@ export default class BarcodeScanner extends LightningElement {
                                 })
                                 .catch(error => console.error('Error creating Scanned Contact:', error));
                         }, 2000);
+                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         this.locationSuspended = 'Cares Center';
                     }
                     if (this.foodPantryVal) {
@@ -351,7 +351,7 @@ export default class BarcodeScanner extends LightningElement {
                         this.locationSuspended = 'Food Pantry';
                     }
                     if (this.learningAcademyVal) {
-                        updateSeminarAssistance({contactId : this.scannedBarcode, typeOfWorkshop: this.workshopType, workshopName: this.workshopName});
+                        updateSeminarAssistance({contactId : this.scannedBarcode, typeOfSeminar: this.seminarType, seminarName: this.seminarName});
                         this.seminarAssistanceUpdated = true;
                     }
                     isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
@@ -668,12 +668,12 @@ export default class BarcodeScanner extends LightningElement {
         return this.totalAmount.toFixed(2);
     }
 
-    handleWorkshopChange(event) {
-        this.workshopType = event.detail.value;
+    handleSeminarChange(event) {
+        this.seminarType = event.detail.value;
     }
 
-    handleWorkshopName(event) {
-        this.workshopName = event.detail.value;
+    handleSeminarName(event) {
+        this.seminarName = event.detail.value;
     }
 
     handleOnselect(event) {

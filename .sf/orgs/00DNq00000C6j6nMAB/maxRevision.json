@@ -1,0 +1,36 @@
+{
+    "fileVersion": 0,
+    "serverMaxRevisionCounter": 12,
+    "sourceMembers": {
+        "Profile__Admin": {
+            "memberType": "Profile",
+            "serverRevisionCounter": 8,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__qrCodeScanner": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 9,
+            "lastRetrievedFromServer": 9,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__qrCodeScanner/qrCodeScanner.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 10,
+            "lastRetrievedFromServer": 10,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__qrCodeScanner/qrCodeScanner.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 11,
+            "lastRetrievedFromServer": 11,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__qrCodeScanner/qrCodeScanner.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 12,
+            "lastRetrievedFromServer": 12,
+            "isNameObsolete": false
+        }
+    }
+}

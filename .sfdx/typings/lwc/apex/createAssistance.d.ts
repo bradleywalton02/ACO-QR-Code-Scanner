@@ -62,7 +62,7 @@ declare module "@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance
   export default function updateSchoolSuppliesAssistance(param: {contactId: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.updateSeminarAssistance" {
-  export default function updateSeminarAssistance(param: {contactId: any, typeOfWorkshop: any, workshopName: any}): Promise<any>;
+  export default function updateSeminarAssistance(param: {contactId: any, typeOfSeminar: any, seminarName: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.updateSpecialEventBalance" {
   export default function updateSpecialEventBalance(param: {contactId: any, recordTypeId: any, amount: any}): Promise<any>;
