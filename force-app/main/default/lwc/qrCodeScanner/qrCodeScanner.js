@@ -92,75 +92,75 @@ export default class BarcodeScanner extends LightningElement {
     saveDraftValues = [];
 
     foodPantryDateColumns = [
-        {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
     foodPantryDateResult;
 
     holidayFoodDateColumns = [
-        {label: 'Last Date of Holiday Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last Date of Holiday Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
     holidayFoodDateResult;
 
     summerFoodDateColumns = [
-        {label: 'Last Date of Summer Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last Date of Summer Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
     summerFoodDateResult;
 
     numberKidsSummerFoodColumns = [
-        {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_SUMMER_FIELD.fieldApiName, type: 'text'}
+        {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_SUMMER_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
     numberKidsSummerFoodResult;
 
     numberKidsNorthPoleColumns = [
-        {label: '# Kids For North Pole', fieldName: NUMBER_KIDS_NP_FIELD.fieldApiName, type: 'text'}
+        {label: '# Kids For North Pole', fieldName: NUMBER_KIDS_NP_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNumberKidsForNorthPole, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
     numberKidsNorthPoleResult;
     
     northPoleChildInfoColumns = [
-        {label: 'Name of Child', fieldName: CHILD_NAME_NP_FIELD.fieldApiName, type: 'text'},
-        {label: 'Age', fieldName: CHILD_AGE_NP_FIELD.fieldApiName, type: 'text'},
-        {label: 'Gender', fieldName: CHILD_GENDER_NP_FIELD.fieldApiName, type: 'text'}
+        {label: 'Name of Child', fieldName: CHILD_NAME_NP_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Age', fieldName: CHILD_AGE_NP_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Gender', fieldName: CHILD_GENDER_NP_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNorthPoleChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
     northPoleChildInfoResult;
 
     schoolSuppliesDateColumns = [
-        {label: 'Last School Supplies Application', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last School Supplies Application', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     schoolSuppliesDateResult;
 
     numberKidsSchoolSuppliesColumns = [
-        {label: '# Kids For School Supplies', fieldName: NUMBER_KIDS_SS_FIELD.fieldApiName, type: 'text'}
+        {label: '# Kids For School Supplies', fieldName: NUMBER_KIDS_SS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
     numberKidsSchoolSuppliesResult;
 
     schoolSuppliesChildInfoColumns = [
-        {label: 'Name of Child', fieldName: CHILD_NAME_SS_FIELD.fieldApiName, type: 'text'},
-        {label: 'Age', fieldName: CHILD_AGE_SS_FIELD.fieldApiName, type: 'text'},
-        {label: 'Grade', fieldName: CHILD_GRADE_SS_FIELD.fieldApiName, type: 'text'},
-        {label: 'Gender', fieldName: CHILD_GENDER_SS_FIELD.fieldApiName, type: 'text'}
+        {label: 'Name of Child', fieldName: CHILD_NAME_SS_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Age', fieldName: CHILD_AGE_SS_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Grade', fieldName: CHILD_GRADE_SS_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Gender', fieldName: CHILD_GENDER_SS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getSchoolSuppliesChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
     schoolSuppliesChildInfoResult;
 
     caresCenterDateColumns = [
-        {label: 'Last Cares Center Visit', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Last Cares Center Visit', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
     caresCenterDateResult;
 
     laundryDetergentColumns = [
-        {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getLaundryDetergent, {contactId : '$scannedBarcode'})
     laundryDetergent({error, data}) {
@@ -184,8 +184,8 @@ export default class BarcodeScanner extends LightningElement {
     }
 
     paperTowelColumns = [
-        {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getPaperTowel, {contactId : '$scannedBarcode'})
     paperTowel({error, data}) {
@@ -209,8 +209,8 @@ export default class BarcodeScanner extends LightningElement {
     }
 
     toiletPaperColumns = [
-        {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text'},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text'}
+        {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
+        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getToiletPaper, {contactId : '$scannedBarcode'})
     toiletPaper({error, data}) {
@@ -234,25 +234,25 @@ export default class BarcodeScanner extends LightningElement {
     }
 
     caresCardBalanceColumns = [
-        {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true}
+        {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true, resizable: false}
     ];
     @wire(getCaresCardBalance, {contactId : '$scannedBarcode'})
     caresCardBalanceResult;
 
     householdSizeColumns = [
-        {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text'}
+        {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
     totalNumberInHouseholdResult;
 
     foodNoShowStatusColumns = [
-        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
     foodNoShowStatusResult;
 
     caresNoShowStatusColumns = [
-        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text'}
+        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '012Nt000000plo5IAA'})
     caresNoShowStatusResult;
