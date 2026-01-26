@@ -158,8 +158,21 @@
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable
-        key-field="Id" data={caresNoShowStatusResult.data} columns={caresNoShowStatusColumns}>
+        key-field="Id" data={caresNoShowStatusResult.data} columns={caresNoShowStatusColumns} hide-checkbox-column>
         </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Id" data={totalNumberInHouseholdResult.data} columns={householdSizeColumns} hide-checkbox-column>
+        </lightning-datatable>
+        <br>
+    </template>
+    <template if:true={caresCenterVal}>
+        <lightning-datatable
+        key-field="Id" data={numberKidsResult.data} columns={numberKidsColumns} hide-checkbox-column>
+        </lightning-datatable>
+        <br>
     </template>
     <template if:true={caresCenterVal}>
         <lightning-datatable

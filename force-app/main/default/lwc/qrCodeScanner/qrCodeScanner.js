@@ -13,7 +13,7 @@ import CHILD_AGE_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Age__c';
 import CHILD_GENDER_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Gender__c';
 import CHILD_GRADE_SS_FIELD from '@salesforce/schema/SS_Child__C.Child_Grade__c';
 import NUMBER_KIDS_SS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of_Children_Receiving_School_Supplies__c';
-import NUMBER_KIDS_SUMMER_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
+import NUMBER_KIDS_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
 import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eligible_for_Food_Pantry_Shopping__c';
 import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
@@ -110,8 +110,14 @@ export default class BarcodeScanner extends LightningElement {
     @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
     summerFoodDateResult;
 
+    numberKidsColumns = [
+        {label: '# of Children', fieldName: NUMBER_KIDS_FIELD.fieldApiName, type: 'text', resizable: false}
+    ];
+    @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
+    numberKidsResult;
+
     numberKidsSummerFoodColumns = [
-        {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_SUMMER_FIELD.fieldApiName, type: 'text', resizable: false}
+        {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
     @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
     numberKidsSummerFoodResult;
