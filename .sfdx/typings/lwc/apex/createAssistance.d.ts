@@ -26,7 +26,7 @@ declare module "@salesforce/apex/createAssistance.getScannedContacts" {
   export default function getScannedContacts(param: {eventType: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.createScannedContact" {
-  export default function createScannedContact(param: {contactId: any, contactName: any, eventType: any}): Promise<any>;
+  export default function createScannedContact(param: {contactId: any, eventType: any}): Promise<any>;
 }
 declare module "@salesforce/apex/createAssistance.deleteScannedContact" {
   export default function deleteScannedContact(param: {contactId: any, eventType: any}): Promise<any>;

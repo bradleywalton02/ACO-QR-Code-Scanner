@@ -91,6 +91,8 @@ export default class BarcodeScanner extends LightningElement {
     seminarName;
     saveDraftValues = [];
 
+    isProcessingScan = false;
+
     foodPantryDateColumns = [
         {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
         {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
@@ -311,6 +313,8 @@ export default class BarcodeScanner extends LightningElement {
         this.poundsValue = '';
         this.isSuspended = false;
         this.locationSuspended = '';
+        if (this.isProcessingScan) return;
+        this.isProcessingScan = true;
 
         // Make sure BarcodeScanner is available before trying to use it
         // Note: We _also_ disable the Scan button if there's no BarcodeScanner
@@ -322,7 +326,7 @@ export default class BarcodeScanner extends LightningElement {
             };
             this.myScanner
                 .beginCapture(scanningOptions)
-                .then((result) => {
+                .then(async (result) => {
                     console.log(result);
                     this.scannedBarcode = result.value;
                     if (this.northPoleVal) {
@@ -334,26 +338,22 @@ export default class BarcodeScanner extends LightningElement {
                         this.schoolSuppliesAssistanceUpdated = true;
                     }
                     if (this.caresCenterVal) {
-                        setTimeout(() => {
-                            createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Cares Center'})
-                                .then(() => {
-                                    // Refresh the data after creation
-                                    return refreshApex(this.wiredScannedContactsCaresResult);
-                                })
-                                .catch(error => console.error('Error creating Scanned Contact:', error));
-                        }, 2000);
+                        await createScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
+                            .then(() => {
+                                // Refresh the data after creation
+                                return refreshApex(this.wiredScannedContactsCaresResult);
+                            })
+                            .catch(error => console.error('Error creating Scanned Contact:', error));
                         createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
                         this.locationSuspended = 'Cares Center';
                     }
                     if (this.foodPantryVal) {
-                        setTimeout(() => {
-                            createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Food Pantry'})
-                                .then(() => {
-                                    // Refresh the data after creation
-                                    return refreshApex(this.wiredScannedContactsFoodResult);
-                                })
+                        await createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Food Pantry'})
+                            .then(() => {
+                                // Refresh the data after creation
+                                return refreshApex(this.wiredScannedContactsFoodResult);
+                            })
                                 .catch(error => console.error('Error creating Scanned Contact:', error));
-                        }, 2000);
                         this.locationSuspended = 'Food Pantry';
                     }
                     if (this.learningAcademyVal) {
@@ -409,6 +409,7 @@ export default class BarcodeScanner extends LightningElement {
 
                     // Clean up by ending capture,
                     // whether we completed successfully or had an error
+                    this.isProcessingScan = false;
                     this.myScanner.endCapture();
                 });
         } else {

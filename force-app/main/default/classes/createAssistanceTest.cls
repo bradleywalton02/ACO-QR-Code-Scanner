@@ -177,7 +177,7 @@ private class createAssistanceTest {
 
         // Call the method to be tested within a try-catch block
         try {
-            createAssistance.createScannedContact(testContact.Id, 'Contact Test', 'Food Pantry');
+            createAssistance.createScannedContact(testContact.Id, 'Food Pantry');
 
             List<Scanned_Contact__c> result = [
                 SELECT Id, Contact_Name__c

@@ -83,24 +83,30 @@ public with sharing class createAssistance {
             SELECT Id, Contact_ID__c, Contact_Name__c, Event_Type__c
             FROM Scanned_Contact__c
             WHERE Event_Type__c = :eventType
+            ORDER BY CreatedDate DESC
         ];
     }
 
     @AuraEnabled
-    public static void createScannedContact(Id contactId, String contactName, String eventType) {
-        List<Scanned_Contact__c> existing = [
-            SELECT Id
-            FROM Scanned_Contact__c
-            WHERE Contact_ID__c = :contactId
-            AND Event_Type__c = :eventType
+    public static void createScannedContact(Id contactId, String eventType) {
+        Contact c = [
+            SELECT Name
+            FROM Contact
+            WHERE Id = :contactId
             LIMIT 1
         ];
-        if (existing.isEmpty()) {
+
+        String uniqueKey = contactId + '-' + eventType;
+
+        try {
             insert new Scanned_Contact__c(
                 Contact_ID__c = contactId,
-                Contact_Name__c = contactName,
-                Event_Type__c = eventType
-            );
+                Contact_Name__c = c.Name,
+                Event_Type__c = eventType,
+                Unique_Key__c = uniqueKey
+        );
+        } catch (DmlException e) {
+            // Ignore duplicates safely
         }
     }
 
