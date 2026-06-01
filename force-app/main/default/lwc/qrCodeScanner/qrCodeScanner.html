@@ -12,9 +12,9 @@
     <div class="slds-p-around_medium lgc-bg">
         <lightning-button-menu alternative-text="Show menu" variant="border-filled" onselect={handleOnselect}>
             <lightning-menu-item value="foodPantry" label="Food Pantry"></lightning-menu-item>
+            <lightning-menu-item value="caresCenter" label="Cares Center"></lightning-menu-item>
             <lightning-menu-item value="northPole" label="North Pole"></lightning-menu-item>
             <lightning-menu-item value="schoolSupplies" label="School Supplies"></lightning-menu-item>
-            <lightning-menu-item value="caresCenter" label="Cares Center"></lightning-menu-item>
             <lightning-menu-item value="learningAcademy" label="WIP - Learning Academy"></lightning-menu-item>
         </lightning-button-menu>
      
@@ -151,70 +151,11 @@
     </template>
 
     <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={caresCenterDateResult.data} columns={caresCenterDateColumns} hide-checkbox-column>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={caresNoShowStatusResult.data} columns={caresNoShowStatusColumns} hide-checkbox-column>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={totalNumberInHouseholdResult.data} columns={householdSizeColumns} hide-checkbox-column>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={numberKidsResult.data} columns={numberKidsColumns} hide-checkbox-column>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={laundryDetergentData} columns={laundryDetergentColumns} onrowselection={handleRowSelection}>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={paperTowelData} columns={paperTowelColumns} onrowselection={handleRowSelection}>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={toiletPaperData} columns={toiletPaperColumns} onrowselection={handleRowSelection}>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-datatable
-        key-field="Id" data={caresCardBalanceResult.data} columns={caresCardBalanceColumns} onsave={handleSave} draft-values={saveDraftValues} hide-checkbox-column>
-        </lightning-datatable>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <div class="slds-text-align_center">
-            <span class="slds-text-heading_small">Total Cost: ${formattedTotalAmount}</span>
-        </div>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-input
-        type="number" step="any" label="Add to Total" onkeyup={handleKeyUpAdd} onblur={handleAddToTotal} data-id="priceInputAdd" hide-checkbox-column>
-        </lightning-input>
-        <br>
-    </template>
-    <template if:true={caresCenterVal}>
-        <lightning-input
-        type="number" step="any" label="Subtract from Total" onkeyup={handleKeyUpSubtract} onblur={handleSubtractFromTotal} data-id="priceInputSubtract" hide-checkbox-column>
-        </lightning-input>
-        <br>
+        <c-cares-center-panel
+            contact-id={scannedBarcode}
+            contact-name={contactName}
+            oncontactchange={handleCaresContactChange}>
+        </c-cares-center-panel>
     </template>
 
     <template if:true={scannedBarcode}>
@@ -298,79 +239,6 @@
                 </div>
             </template>
             <br><br><br>
-        </template>
-        <template if:true={caresCenterVal}>
-            <template if:false={caresCenterCheckedOut}>
-                <div class="slds-align_absolute-center slds-m-vertical_large">
-                    <lightning-button
-                        variant="brand"
-                        class="slds-var-m-left_x-small"
-                        icon-name="action:new"
-                        label="Complete Transaction"
-                        title="Create Cares Center Item for Assistance"
-                        onclick={handleCaresCenterCheckOut}>
-                    </lightning-button>
-                </div>
-            </template>
-            <template if:true={caresCenterCheckedOut}>
-                <div class="slds-text-align_center">
-                    <span class="slds-text-heading_large">Transaction Completed</span>
-                </div>
-            </template>
-            <br><br><br>
-        </template>
-        <template if:true={caresCenterVal}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:refresh"
-                    label="Reset Total Cost"
-                    title="Set Total Amount to $0"
-                    onclick={handleResetTotalAmount}>
-                </lightning-button>
-            </div>
-        <br><br><br>
-        </template>
-        <template if:true={caresCenterVal}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:refresh"
-                    label="Refresh Contact List"
-                    title="Sync the list with Salesforce"
-                    onclick={handleRefreshCares}>
-                </lightning-button>
-            </div>
-        <br><br><br>
-        </template>
-        <template if:true={caresCenterVal}>
-            <template for:each={caresScannedContacts} for:item="contact">
-                <div key={contact.Id}>
-                    <lightning-button
-                        data-id={contact.Contact_ID__c}
-                        variant="brand"
-                        label={contact.Contact_Name__c}
-                        title="View details of this contact"
-                        onclick={handleSwitchContactCares}>
-                    </lightning-button>
-                </div>
-            </template>
-        </template>
-        <br><br><br>
-        <template if:true={caresCenterVal}>
-            <div class="slds-align_absolute-center slds-m-vertical_large">
-                <lightning-button
-                    variant="brand"
-                    class="slds-var-m-left_x-small"
-                    icon-name="action:reject"
-                    label="Remove Current Contact from List"
-                    title="Delete the Scanned Contact"
-                    onclick={handleCaresCenterDeleteScan}>
-                </lightning-button>
-            </div>
-        <br><br><br>
         </template>
         <template if:true={foodPantryVal}>
             <div class="slds-align_absolute-center slds-m-vertical_large">

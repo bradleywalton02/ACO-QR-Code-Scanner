@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import { getRecord, getFieldValue, updateRecord } from 'lightning/uiRecordApi';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
 import CONTACT_NAME_FIELD from '@salesforce/schema/Contact.Name';
 import CLIENTID_FIELD from '@salesforce/schema/Contact.c4g_Client_ID__c';
@@ -16,18 +16,15 @@ import NUMBER_KIDS_SS_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.of
 import NUMBER_KIDS_FIELD from '@salesforce/schema/Case.Children_in_Your_Home_0_17__c';
 import NUMBER_HOUSEHOLD_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Total_Number_in_Household__c';
 import FOOD_ELIGIBLE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.Eligible_for_Food_Pantry_Shopping__c';
-import ITEM_DATE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Date_Item_was_Received__c';
-import ITEM_ELIGIBLE_FIELD from '@salesforce/schema/Cares_Center_Item__c.Eligible_for_Item__c';
-import CARES_BALANCE_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.ACO_Cares_Card__c';
 import NO_SHOW_FIELD from '@salesforce/schema/c4g_Client_Assistance__c.No_Show_Formula_for_Scanner__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 import createFoodAssistance from '@salesforce/apex/createAssistance.createFoodAssistance';
 import createCaresCenterAssistance from '@salesforce/apex/createAssistance.createCaresCenterAssistance';
-import createCaresCenterItem from '@salesforce/apex/createAssistance.createCaresCenterItem';
 import updateNorthPoleAssistance from '@salesforce/apex/createAssistance.updateNorthPoleAssistance';
 import updateSchoolSuppliesAssistance from '@salesforce/apex/createAssistance.updateSchoolSuppliesAssistance';
 import updateSeminarAssistance from '@salesforce/apex/createAssistance.updateSeminarAssistance';
+import updateSpecialEventBalance from '@salesforce/apex/createAssistance.updateSpecialEventBalance';
 import getLastAssistanceDate from '@salesforce/apex/createAssistance.getLastAssistanceDate';
 import getNumberKidsForNorthPole from '@salesforce/apex/createAssistance.getNumberKidsForNorthPole';
 import getTotalNumberInHousehold from '@salesforce/apex/createAssistance.getTotalNumberInHousehold';
@@ -35,11 +32,6 @@ import getNorthPoleChildInfo from '@salesforce/apex/createAssistance.getNorthPol
 import getSchoolSuppliesChildInfo from '@salesforce/apex/createAssistance.getSchoolSuppliesChildInfo';
 import getNumberBackpacks from '@salesforce/apex/createAssistance.getNumberBackpacks';
 import getNumberKidsForSummerFood from '@salesforce/apex/createAssistance.getNumberKidsForSummerFood';
-import getLaundryDetergent from '@salesforce/apex/createAssistance.getLaundryDetergent';
-import getPaperTowel from '@salesforce/apex/createAssistance.getPaperTowel';
-import getToiletPaper from '@salesforce/apex/createAssistance.getToiletPaper';
-import getCaresCardBalance from '@salesforce/apex/createAssistance.getCaresCardBalance';
-import updateCaresCardBalance from '@salesforce/apex/createAssistance.updateCaresCardBalance';
 import getNoShowStatus from '@salesforce/apex/createAssistance.getNoShowStatus';
 import isContactSuspended from '@salesforce/apex/createAssistance.isContactSuspended';
 import getScannedContacts from '@salesforce/apex/createAssistance.getScannedContacts';
@@ -61,7 +53,6 @@ export default class BarcodeScanner extends LightningElement {
     seminarAssistanceUpdated = false;
     northPoleAssistanceUpdated = false;
     schoolSuppliesAssistanceUpdated = false;
-    caresCenterCheckedOut = false;
 
     scanButtonDisabled = false;
     isCreateFoodButtonDisabled = false;
@@ -80,16 +71,11 @@ export default class BarcodeScanner extends LightningElement {
     learningAcademyVal = false;
 
     totalAmount = 0;
-    selectedRows = [];
-    laundryDetergentData = [];
-    paperTowelData = [];
-    toiletPaperData = [];
     poundsValue;
 
     selectedItemValue;
     seminarType;
     seminarName;
-    saveDraftValues = [];
 
     isProcessingScan = false;
 
@@ -97,37 +83,31 @@ export default class BarcodeScanner extends LightningElement {
         {label: 'Last Date of Food Pantry Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
         {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '01239000000EG3lAAG'})
+    @wire(getLastAssistanceDate, {contactId : '$foodContactId', recordTypeId : '01239000000EG3lAAG'})
     foodPantryDateResult;
 
     holidayFoodDateColumns = [
         {label: 'Last Date of Holiday Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000Q9xaAAC'})
+    @wire(getLastAssistanceDate, {contactId : '$foodContactId', recordTypeId : '0124z000000Q9xaAAC'})
     holidayFoodDateResult;
 
     summerFoodDateColumns = [
         {label: 'Last Date of Summer Food Assistance', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '0124z000000JQpFAAW'})
+    @wire(getLastAssistanceDate, {contactId : '$foodContactId', recordTypeId : '0124z000000JQpFAAW'})
     summerFoodDateResult;
-
-    numberKidsColumns = [
-        {label: '# of Children', fieldName: NUMBER_KIDS_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
-    numberKidsResult;
 
     numberKidsSummerFoodColumns = [
         {label: '# Kids for Summer Food', fieldName: NUMBER_KIDS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getNumberKidsForSummerFood, {contactId : '$scannedBarcode'})
+    @wire(getNumberKidsForSummerFood, {contactId : '$foodContactId'})
     numberKidsSummerFoodResult;
 
     numberKidsNorthPoleColumns = [
         {label: '# Kids For North Pole', fieldName: NUMBER_KIDS_NP_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getNumberKidsForNorthPole, {contactId : '$scannedBarcode', recordTypeId : '012390000006CFBAA2'})
+    @wire(getNumberKidsForNorthPole, {contactId : '$northPoleContactId', recordTypeId : '012390000006CFBAA2'})
     numberKidsNorthPoleResult;
     
     northPoleChildInfoColumns = [
@@ -135,19 +115,19 @@ export default class BarcodeScanner extends LightningElement {
         {label: 'Age', fieldName: CHILD_AGE_NP_FIELD.fieldApiName, type: 'text', resizable: false},
         {label: 'Gender', fieldName: CHILD_GENDER_NP_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getNorthPoleChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaign'})
+    @wire(getNorthPoleChildInfo, {contactId : '$northPoleContactId', campaignName : '$nameOfCampaign'})
     northPoleChildInfoResult;
 
     schoolSuppliesDateColumns = [
         {label: 'Last School Supplies Application', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    @wire(getLastAssistanceDate, {contactId : '$schoolSuppliesContactId', recordTypeId : '012390000006CF1AAM'})
     schoolSuppliesDateResult;
 
     numberKidsSchoolSuppliesColumns = [
         {label: '# Kids For School Supplies', fieldName: NUMBER_KIDS_SS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getNumberBackpacks, {contactId : '$scannedBarcode', recordTypeId : '012390000006CF1AAM'})
+    @wire(getNumberBackpacks, {contactId : '$schoolSuppliesContactId', recordTypeId : '012390000006CF1AAM'})
     numberKidsSchoolSuppliesResult;
 
     schoolSuppliesChildInfoColumns = [
@@ -156,114 +136,20 @@ export default class BarcodeScanner extends LightningElement {
         {label: 'Grade', fieldName: CHILD_GRADE_SS_FIELD.fieldApiName, type: 'text', resizable: false},
         {label: 'Gender', fieldName: CHILD_GENDER_SS_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getSchoolSuppliesChildInfo, {contactId : '$scannedBarcode', campaignName : '$nameOfCampaignSS'})
+    @wire(getSchoolSuppliesChildInfo, {contactId : '$schoolSuppliesContactId', campaignName : '$nameOfCampaignSS'})
     schoolSuppliesChildInfoResult;
-
-    caresCenterDateColumns = [
-        {label: 'Last Cares Center Visit', fieldName: ASSISTANCE_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
-        {label: 'Eligible', fieldName: FOOD_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getLastAssistanceDate, {contactId : '$scannedBarcode', recordTypeId : '012Nt000000plo5IAA'})
-    caresCenterDateResult;
-
-    laundryDetergentColumns = [
-        {label: 'Laundry Detergent', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getLaundryDetergent, {contactId : '$scannedBarcode'})
-    laundryDetergent({error, data}) {
-        if (data) {
-            // Check if the data array is empty
-            if (data.length == 0) {
-                // If the data array is empty, assign a placeholder row
-                this.laundryDetergentData = [{
-                    Id: 'placeholder-laundry-detergent-' + this.scannedBarcode,
-                    Name: 'Laundry Detergent',
-                    Date_Item_was_Received__c: null,
-                    Eligible_for_Item__c: null
-                }];
-            } else {
-                // If data is available, assign it to the component property
-                this.laundryDetergentData = JSON.parse(JSON.stringify(data));
-            }
-        } else if (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    paperTowelColumns = [
-        {label: 'Paper Towel', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getPaperTowel, {contactId : '$scannedBarcode'})
-    paperTowel({error, data}) {
-        if (data) {
-            // Check if the data array is empty
-            if (data.length == 0) {
-                // If the data array is empty, assign a placeholder row
-                this.paperTowelData = [{
-                    Id: 'placeholder-paper-towel-' + this.scannedBarcode,
-                    Name: 'Paper Towel',
-                    Date_Item_was_Received__c: null,
-                    Eligible_for_Item__c: null
-                }];
-            } else {
-                // If data is available, assign it to the component property
-                this.paperTowelData = JSON.parse(JSON.stringify(data));
-            }
-        } else if (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    toiletPaperColumns = [
-        {label: 'Toilet Paper', fieldName: ITEM_DATE_FIELD.fieldApiName, type: 'text', resizable: false},
-        {label: 'Eligible', fieldName: ITEM_ELIGIBLE_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getToiletPaper, {contactId : '$scannedBarcode'})
-    toiletPaper({error, data}) {
-        if (data) {
-            // Check if the data array is empty
-            if (data.length == 0) {
-                // If the data array is empty, assign a placeholder row
-                this.toiletPaperData = [{
-                    Id: 'placeholder-toilet-paper-' + this.scannedBarcode,
-                    Name: 'Toilet Paper',
-                    Date_Item_was_Received__c: null,
-                    Eligible_for_Item__c: null
-                }];
-            } else {
-                // If data is available, assign it to the component property
-                this.toiletPaperData = JSON.parse(JSON.stringify(data));
-            }
-        } else if (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    caresCardBalanceColumns = [
-        {label: 'Cares Account Balance', fieldName: CARES_BALANCE_FIELD.fieldApiName, type: 'number', editable: true, resizable: false}
-    ];
-    @wire(getCaresCardBalance, {contactId : '$scannedBarcode'})
-    caresCardBalanceResult;
 
     householdSizeColumns = [
         {label: 'Total # in Household', fieldName: NUMBER_HOUSEHOLD_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getTotalNumberInHousehold, {contactId : '$scannedBarcode'})
+    @wire(getTotalNumberInHousehold, {contactId : '$foodContactId'})
     totalNumberInHouseholdResult;
 
     foodNoShowStatusColumns = [
         {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text', resizable: false}
     ];
-    @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '01239000000EG3lAAG'})
+    @wire(getNoShowStatus, {contactId : '$foodContactId', recordTypeId: '01239000000EG3lAAG'})
     foodNoShowStatusResult;
-
-    caresNoShowStatusColumns = [
-        {label: 'No Show for Last Visit?', fieldName: NO_SHOW_FIELD.fieldApiName, type: 'text', resizable: false}
-    ];
-    @wire(getNoShowStatus, {contactId : '$scannedBarcode', recordTypeId: '012Nt000000plo5IAA'})
-    caresNoShowStatusResult;
 
     @wire(getRecord, {recordId : '$scannedBarcode', fields: [CONTACT_NAME_FIELD, CLIENTID_FIELD]})
     wiredContact({error, data}) {
@@ -276,18 +162,23 @@ export default class BarcodeScanner extends LightningElement {
         }
     }
 
-    @wire(getScannedContacts, {eventType: 'Cares Center'})
-    wiredScannedContactsCaresResult;
-    
     @wire(getScannedContacts, {eventType: 'Food Pantry'})
     wiredScannedContactsFoodResult;
 
-    get caresScannedContacts() {
-        return this.wiredScannedContactsCaresResult?.data || [];
-    }
-    
     get foodScannedContacts() {
         return this.wiredScannedContactsFoodResult?.data || [];
+    }
+
+    get foodContactId() {
+        return this.foodPantryVal ? this.scannedBarcode : null;
+    }
+
+    get northPoleContactId() {
+        return this.northPoleVal ? this.scannedBarcode : null;
+    }
+
+    get schoolSuppliesContactId() {
+        return this.schoolSuppliesVal ? this.scannedBarcode : null;
     }
 
     // When component is initialized, detect whether to enable Scan button
@@ -299,138 +190,169 @@ export default class BarcodeScanner extends LightningElement {
         this.scannedBarcode = null;
     }
 
-    handleBeginScanClick(event) {
-        // Reset scannedBarcode to empty string before starting new scan
+    async handleBeginScanClick(event) {
+        if (this.isProcessingScan) {
+            return;
+        }
+
+        this.resetScanState();
+
+        if (!this.myScanner || !this.myScanner.isAvailable()) {
+            this.showToast(
+                'QR Code Scanner Is Not Available',
+                'Try again from the Salesforce app on a mobile device.',
+                'error'
+            );
+            return;
+        }
+
+        this.isProcessingScan = true;
+
+        try {
+            const result = await this.myScanner.beginCapture({
+                barcodeTypes: [this.myScanner.barcodeTypes.QR],
+                instructionText: 'Scan a QR Code',
+                successText: 'Scanning complete.'
+            });
+
+            this.scannedBarcode = result.value;
+            await this.handleSuccessfulScan();
+
+            this.showToast('Successful Scan', 'QR Code scanned successfully.', 'success');
+        } catch (error) {
+            this.handleScanError(error);
+        } finally {
+            this.isProcessingScan = false;
+
+            try {
+                this.myScanner.endCapture();
+            } catch (error) {
+                // endCapture can fail if capture never fully started.
+                // This should not block the user from scanning again.
+                console.error('Error ending scanner capture:', error);
+            }
+        }
+    }
+
+    resetScanState() {
         this.scannedBarcode = '';
         this.foodPantryAssistanceCreated = false;
         this.holidayFoodAssistanceCreated = false;
         this.summerFoodAssistanceCreated = false;
         this.northPoleAssistanceUpdated = false;
         this.schoolSuppliesAssistanceUpdated = false;
-        this.caresCenterCheckedOut = false;
-        this.selectedRows = [];
-        this.totalAmount = 0;
         this.poundsValue = '';
         this.isSuspended = false;
         this.locationSuspended = '';
-        if (this.isProcessingScan) return;
-        this.isProcessingScan = true;
+    }
 
-        // Make sure BarcodeScanner is available before trying to use it
-        // Note: We _also_ disable the Scan button if there's no BarcodeScanner
-        if (this.myScanner != null && this.myScanner.isAvailable()) {
-            const scanningOptions = {
-                barcodeTypes: [this.myScanner.barcodeTypes.QR],
-                instructionText: 'Scan a QR Code',
-                successText: 'Scanning complete.'
-            };
-            this.myScanner
-                .beginCapture(scanningOptions)
-                .then(async (result) => {
-                    console.log(result);
-                    this.scannedBarcode = result.value;
-                    if (this.northPoleVal) {
-                        updateNorthPoleAssistance({contactId : this.scannedBarcode});
-                        this.northPoleAssistanceUpdated = true;
-                    }
-                    if (this.schoolSuppliesVal) {
-                        updateSchoolSuppliesAssistance({contactId : this.scannedBarcode});
-                        this.schoolSuppliesAssistanceUpdated = true;
-                    }
-                    if (this.caresCenterVal) {
-                        await createScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
-                            .then(() => {
-                                // Refresh the data after creation
-                                return refreshApex(this.wiredScannedContactsCaresResult);
-                            })
-                            .catch(error => console.error('Error creating Scanned Contact:', error));
-                        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: 0});
-                        this.locationSuspended = 'Cares Center';
-                    }
-                    if (this.foodPantryVal) {
-                        await createScannedContact({contactId: this.scannedBarcode, contactName: this.contactName, eventType: 'Food Pantry'})
-                            .then(() => {
-                                // Refresh the data after creation
-                                return refreshApex(this.wiredScannedContactsFoodResult);
-                            })
-                                .catch(error => console.error('Error creating Scanned Contact:', error));
-                        this.locationSuspended = 'Food Pantry';
-                    }
-                    if (this.learningAcademyVal) {
-                        updateSeminarAssistance({contactId : this.scannedBarcode, typeOfSeminar: this.seminarType, seminarName: this.seminarName});
-                        this.seminarAssistanceUpdated = true;
-                    }
-                    isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
-                        .then(result => {
-                            this.isSuspended = result;
-                        })
-                        .catch(error => {
-                            console.error('Error checking suspension:', error);
-                        });
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Successful Scan',
-                            message: 'QR Code scanned successfully.',
-                            variant: 'success'
-                        })
-                    );
-                })
-                .catch((error) => {
-                    // Handle cancellation and unexpected errors here
-                    console.error(error);
+    async handleSuccessfulScan() {
+        const actions = [];
 
-                    if (error.code == 'userDismissedScanner') {
-                        // User clicked Cancel
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'Scanning Cancelled',
-                                message:
-                                    'You cancelled the scanning session.',
-                                mode: 'sticky'
-                            })
-                        );
-                    }
-                    else { 
-                        // Inform the user we ran into something unexpected
-                        this.dispatchEvent(
-                            new ShowToastEvent({
-                                title: 'QR Code Scanner Error',
-                                message:
-                                    'There was a problem scanning the QR code: ' +
-                                    error.message,
-                                variant: 'error',
-                                mode: 'sticky'
-                            })
-                        );
-                    }
-                })
-                .finally(() => {
-                    console.log('#finally');
-
-                    // Clean up by ending capture,
-                    // whether we completed successfully or had an error
-                    this.isProcessingScan = false;
-                    this.myScanner.endCapture();
-                });
-        } else {
-            // BarcodeScanner is not available
-            // Not running on hardware with a camera, or some other context issue
-            console.log(
-                'Scan QR Code button should be disabled and unclickable.'
-            );
-            console.log('Somehow it got clicked: ');
-            console.log(event);
-
-            // Let user know they need to use a mobile phone with a camera
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'QR Code Scanner Is Not Available',
-                    message:
-                        'Try again from the Salesforce app on a mobile device.',
-                    variant: 'error'
-                })
-            );
+        if (this.northPoleVal) {
+            actions.push(this.checkInNorthPole());
         }
+
+        if (this.schoolSuppliesVal) {
+            actions.push(this.checkInSchoolSupplies());
+        }
+
+        if (this.caresCenterVal) {
+            this.locationSuspended = 'Cares Center';
+            actions.push(this.startCaresCenterVisit());
+        }
+
+        if (this.foodPantryVal) {
+            this.locationSuspended = 'Food Pantry';
+            actions.push(this.addFoodPantryScannedContact());
+        }
+
+        if (this.learningAcademyVal) {
+            actions.push(this.checkInLearningAcademy());
+        }
+
+        await Promise.all(actions);
+        await this.checkSuspensionStatus();
+    }
+
+    async checkInNorthPole() {
+        await updateNorthPoleAssistance({ contactId: this.scannedBarcode });
+        this.northPoleAssistanceUpdated = true;
+    }
+
+    async checkInSchoolSupplies() {
+        await updateSchoolSuppliesAssistance({ contactId: this.scannedBarcode });
+        this.schoolSuppliesAssistanceUpdated = true;
+    }
+
+    async startCaresCenterVisit() {
+        await createScannedContact({
+            contactId: this.scannedBarcode,
+            eventType: 'Cares Center'
+        });
+        // Creates today's Cares Center assistance if one does not exist yet.
+        await createCaresCenterAssistance({
+            contactId: this.scannedBarcode,
+            recordTypeId: '012Nt000000plo5IAA',
+            amountSpent: 0
+        });
+
+        await this.refreshCaresPanelScannedContacts();
+    }
+
+    async addFoodPantryScannedContact() {
+        await createScannedContact({
+            contactId: this.scannedBarcode,
+            eventType: 'Food Pantry'
+        });
+        await refreshApex(this.wiredScannedContactsFoodResult);
+    }
+
+    async checkInLearningAcademy() {
+        await updateSeminarAssistance({
+            contactId: this.scannedBarcode,
+            typeOfSeminar: this.seminarType,
+            seminarName: this.seminarName
+        });
+        this.seminarAssistanceUpdated = true;
+    }
+
+    async checkSuspensionStatus() {
+        if (!this.scannedBarcode || !this.locationSuspended) {
+            this.isSuspended = false;
+            return;
+        }
+
+        try {
+            this.isSuspended = await isContactSuspended({
+                contactId: this.scannedBarcode,
+                location: this.locationSuspended
+            });
+        } catch (error) {
+            this.isSuspended = false;
+            console.error('Error checking suspension:', error);
+        }
+    }
+
+    handleScanError(error) {
+        console.error(error);
+
+        if (error?.code == 'userDismissedScanner') {
+            this.showToast(
+                'Scanning Cancelled',
+                'You cancelled the scanning session.',
+                'info',
+                'sticky'
+            );
+            return;
+        }
+
+        this.showToast(
+            'QR Code Scanner Error',
+            `There was a problem scanning the QR code: ${this.reduceError(error)}`,
+            'error',
+            'sticky'
+        );
     }
 
     async handleCreateFoodPantryAssistance() {
@@ -504,11 +426,6 @@ export default class BarcodeScanner extends LightningElement {
         this.poundsValue = event.detail.value;
     }
 
-    handleRowSelection(event) {
-        const newlySelectedRows = event.detail.selectedRows;
-        this.selectedRows = [...this.selectedRows, ...newlySelectedRows];
-    }
-
     handleSchoolSuppliesUpdate() {
         updateSchoolSuppliesAssistance({contactId : this.scannedBarcode});
         updateSpecialEventBalance({contactId : this.scannedBarcode, recordTypeId : '012390000006CF1AAM', amount: this.totalAmount})
@@ -527,83 +444,27 @@ export default class BarcodeScanner extends LightningElement {
         this.schoolSuppliesAssistanceUpdated = true;
     }
 
-    handleCaresCenterCheckOut() {
-        createCaresCenterAssistance({contactId : this.scannedBarcode, recordTypeId: '012Nt000000plo5IAA', amountSpent: this.totalAmount});
-        this.selectedRows.forEach(row => {
-            if (row.Name == 'Laundry Detergent') {
-                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Laundry Detergent'});
-            }
+    async handleFoodPantryDeleteScan() {
+        await this.deleteScannedContactAndRefresh('Food Pantry');
+    }
 
-            else if (row.Name == 'Paper Towel') {
-                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Paper Towel'});
-            }
-
-            else if (row.Name == 'Toilet Paper') {
-                createCaresCenterItem({contactId : this.scannedBarcode, itemName: 'Toilet Paper'});
-            }
-        });
-
-        updateCaresCardBalance({contactId : this.scannedBarcode, amount: this.totalAmount})
-            .then(res => {
-                this.refresh();
-            })
-            .catch(error => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error Updating Balance',
-                        message: 'Cares Account balance could not be updated.',
-                        variant: 'error'
-                    })
-                );
+    async deleteScannedContactAndRefresh(eventType) {
+        try {
+            await deleteScannedContact({
+                contactId: this.scannedBarcode,
+                eventType
             });
 
-        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
-            .then(() => {
-                // Refresh the data after deletion
-                return refreshApex(this.wiredScannedContactsCaresResult);
-            })
-            .catch(error => console.error('Error deleting Scanned Contact:', error));
-
-        this.caresCenterCheckedOut = true;
-    }
-
-    handleFoodPantryDeleteScan() {
-        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Food Pantry'})
-        .then(() => {
-            // Refresh the data after deletion
-            return refreshApex(this.wiredScannedContactsFoodResult);
-        })
-        .catch(error => console.error('Error deleting Scanned Contact:', error));
-    }
-
-    handleCaresCenterDeleteScan() {
-        deleteScannedContact({contactId: this.scannedBarcode, eventType: 'Cares Center'})
-        .then(() => {
-            // Refresh the data after deletion
-            return refreshApex(this.wiredScannedContactsCaresResult);
-        })
-        .catch(error => console.error('Error deleting Scanned Contact:', error));
-    }
-    
-    async handleSwitchContactCares(event) {
-        const contactId = event.currentTarget.dataset.id;
-        const contact = this.caresScannedContacts.find(item => item.Contact_ID__c == contactId);
-    
-        if (contact) {
-            this.scannedBarcode = contact.Contact_ID__c;
-            this.contactName = contact.Contact_Name__c;
-            this.caresCenterCheckedOut = false; 
-            this.selectedRows = [];
-            this.totalAmount = 0;
+            if (eventType == 'Food Pantry') {
+                await refreshApex(this.wiredScannedContactsFoodResult);
+            }
+        } catch (error) {
+            this.showToast(
+                'Delete Failed',
+                `Could not remove contact from the scanned list: ${this.reduceError(error)}`,
+                'error'
+            );
         }
-
-        isContactSuspended({contactId: this.scannedBarcode, location: this.locationSuspended})
-            .then(result => {
-                this.isSuspended = result;
-            })
-            .catch(error => {
-                console.error('Error checking suspension:', error);
-            });
     }
 
     async handleSwitchContactFood(event) {
@@ -627,54 +488,6 @@ export default class BarcodeScanner extends LightningElement {
             });
     }
 
-    handleKeyUpAdd(event) {
-        if (event.keyCode == 13) { // 13 is the key code for Enter
-            // Call the original blur handler
-            this.handleAddToTotal(event);
-            // Blur the input element to hide the keyboard
-            event.target.blur();
-        }
-    }
-
-    handleKeyUpSubtract(event) {
-        if (event.keyCode == 13) { // 13 is the key code for Enter
-            // Call the original blur handler
-            this.handleSubtractFromTotal(event);
-            // Blur the input element to hide the keyboard
-            event.target.blur();
-        }
-    }
-
-    handleAddToTotal(event) {
-        if (!isNaN(parseFloat(event.target.value))) {
-            this.totalAmount += parseFloat(event.target.value);
-        }
-
-        const inputField = this.template.querySelector('lightning-input[data-id="priceInputAdd"]');
-        if (inputField) {
-            inputField.value = ''; // Clear the value
-        }
-    }
-
-    handleSubtractFromTotal(event) {
-        if (!isNaN(parseFloat(event.target.value))) {
-            this.totalAmount -= parseFloat(event.target.value);
-        }
-
-        const inputField = this.template.querySelector('lightning-input[data-id="priceInputSubtract"]');
-        if (inputField) {
-            inputField.value = ''; // Clear the value
-        }
-    }
-
-    handleResetTotalAmount() {
-        this.totalAmount = 0;
-    }
-
-    get formattedTotalAmount() {
-        return this.totalAmount.toFixed(2);
-    }
-
     handleSeminarChange(event) {
         this.seminarType = event.detail.value;
     }
@@ -685,81 +498,73 @@ export default class BarcodeScanner extends LightningElement {
 
     handleOnselect(event) {
         this.selectedItemValue = event.detail.value;
- 
-        if (this.selectedItemValue == 'foodPantry') {
-            this.foodPantryVal = true;
-        } else {
-            this.foodPantryVal = false;
-        }
-       
-        if (this.selectedItemValue == 'northPole') {
-            this.northPoleVal = true;
-        } else {
-            this.northPoleVal = false;
-        }
-        
-        if (this.selectedItemValue == 'schoolSupplies') {
-            this.schoolSuppliesVal = true;
-        } else {
-            this.schoolSuppliesVal = false;
-        }
 
-        if (this.selectedItemValue == 'caresCenter') {
-            this.caresCenterVal = true;
-        } else {
-            this.caresCenterVal = false;
-        }
+        this.foodPantryVal = this.selectedItemValue == 'foodPantry';
+        this.northPoleVal = this.selectedItemValue == 'northPole';
+        this.schoolSuppliesVal = this.selectedItemValue == 'schoolSupplies';
+        this.caresCenterVal = this.selectedItemValue == 'caresCenter';
+        this.learningAcademyVal = this.selectedItemValue == 'learningAcademy';
 
-        if (this.selectedItemValue == 'learningAcademy') {
-            this.learningAcademyVal = true;
-        } else {
-            this.learningAcademyVal = false;
-        }
-    }
-
-    handleSave(event) {
-        this.saveDraftValues = event.detail.draftValues;
-        const recordInputs = this.saveDraftValues.slice().map(draft => {
-            const fields = Object.assign({}, draft);
-            return { fields };
-        });
-
-        // Updating the records using the UiRecordAPi
-        const promises = recordInputs.map(recordInput => updateRecord(recordInput));
-        Promise.all(promises).then(res => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Records Updated Successfully!!',
-                    variant: 'success'
-                })
-            );
-            this.saveDraftValues = [];
-            return this.refresh();
-        }).catch(error => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error',
-                    message: 'An Error Occured!!',
-                    variant: 'error'
-                })
-            );
-        }).finally(() => {
-            this.saveDraftValues = [];
-        });
+        this.scannedBarcode = null;
+        this.contactName = null;
+        this.clientid = null;
+        this.isSuspended = false;
     }
 
     handleRefreshFood() {
         refreshApex(this.wiredScannedContactsFoodResult);
     }
 
-    handleRefreshCares() {
-        refreshApex(this.wiredScannedContactsCaresResult);
+    async refresh() {
+        // Placeholder refresh method retained for older handlers such as School Supplies.
+        // Cares Center refreshes now live in caresCenterPanel.js.
     }
 
-    // This function is used to refresh the table once data updated
-    async refresh() {
-        await refreshApex(this.caresCardBalanceResult);
-        await refreshApex(this.schoolSuppliesBalance);
+    async refreshCaresPanelScannedContacts() {
+        await Promise.resolve();
+
+        const caresPanel = this.template.querySelector('c-cares-center-panel');
+
+        if (caresPanel) {
+            await caresPanel.refreshScannedContactList();
+        }
     }
+
+    showToast(title, message, variant = 'info', mode = 'dismissable') {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title,
+                message,
+                variant,
+                mode
+            })
+        );
+    }
+
+    reduceError(error) {
+        if (!error) {
+            return 'Unknown error';
+        }
+
+        if (Array.isArray(error.body)) {
+            return error.body.map(e => e.message).join(', ');
+        }
+
+        if (typeof error.body?.message == 'string') {
+            return error.body.message;
+        }
+
+        if (typeof error.message == 'string') {
+            return error.message;
+        }
+
+        return JSON.stringify(error);
+    }
+    async handleCaresContactChange(event) {
+        this.scannedBarcode = event.detail.contactId;
+        this.contactName = event.detail.contactName;
+        this.locationSuspended = 'Cares Center';
+        await this.checkSuspensionStatus();
+    }
+
 }
