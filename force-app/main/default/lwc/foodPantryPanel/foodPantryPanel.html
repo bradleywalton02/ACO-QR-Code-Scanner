@@ -1,0 +1,173 @@
+<template>
+    <div class="slds-col slds-size_10-of-12">
+        <lightning-input
+            type="number"
+            name="pounds"
+            label="Enter Food Pantry Pounds"
+            value={poundsValue}
+            onchange={handlePounds}>
+        </lightning-input>
+    </div>
+
+    <br>
+
+    <lightning-datatable
+        key-field="Id"
+        data={foodPantryDateResult.data}
+        columns={foodPantryDateColumns}
+        hide-checkbox-column>
+    </lightning-datatable>
+
+    <lightning-datatable
+        key-field="Id"
+        data={totalNumberInHouseholdResult.data}
+        columns={householdSizeColumns}
+        hide-checkbox-column>
+    </lightning-datatable>
+
+    <lightning-datatable
+        key-field="Id"
+        data={foodNoShowStatusResult.data}
+        columns={foodNoShowStatusColumns}
+        hide-checkbox-column>
+    </lightning-datatable>
+
+    <template if:true={holidayActive}>
+        <lightning-datatable
+            key-field="Id"
+            data={holidayFoodDateResult.data}
+            columns={holidayFoodDateColumns}
+            hide-checkbox-column>
+        </lightning-datatable>
+    </template>
+
+    <template if:true={kidsSummerActive}>
+        <lightning-datatable
+            key-field="Id"
+            data={summerFoodDateResult.data}
+            columns={summerFoodDateColumns}
+            hide-checkbox-column>
+        </lightning-datatable>
+
+        <lightning-datatable
+            key-field="Id"
+            data={numberKidsSummerFoodResult.data}
+            columns={numberKidsSummerFoodColumns}
+            hide-checkbox-column>
+        </lightning-datatable>
+        <br>
+    </template>
+
+    <template if:true={activeContactId}>
+        <template if:false={foodPantryAssistanceCreated}>
+            <div class="slds-align_absolute-center slds-m-vertical_large">
+                <lightning-button
+                    variant="brand"
+                    disabled={isFoodPanelLocked}
+                    class="slds-var-m-left_x-small"
+                    icon-name="action:new"
+                    label="Create Food Pantry Assistance"
+                    title="Create Assistance for Contact"
+                    onclick={handleCreateFoodPantryAssistance}>
+                </lightning-button>
+            </div>
+        </template>
+
+        <template if:true={foodPantryAssistanceCreated}>
+            <div class="slds-text-align_center">
+                <span class="slds-text-heading_large">Food Pantry Assistance Created</span>
+            </div>
+        </template>
+
+        <br><br><br>
+
+        <template if:true={holidayActive}>
+            <template if:false={holidayFoodAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        disabled={isFoodPanelLocked}
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Holiday Food Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateHolidayFoodAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <template if:true={holidayFoodAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Holiday Food Assistance Created</span>
+                </div>
+            </template>
+
+            <br><br><br>
+        </template>
+
+        <template if:true={kidsSummerActive}>
+            <template if:false={summerFoodAssistanceCreated}>
+                <div class="slds-align_absolute-center slds-m-vertical_large">
+                    <lightning-button
+                        variant="brand"
+                        disabled={isFoodPanelLocked}
+                        class="slds-var-m-left_x-small"
+                        icon-name="action:new"
+                        label="Create Summer Food Assistance"
+                        title="Create Assistance for Contact"
+                        onclick={handleCreateSummerFoodAssistance}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <template if:true={summerFoodAssistanceCreated}>
+                <div class="slds-text-align_center">
+                    <span class="slds-text-heading_large">Summer Food Assistance Created</span>
+                </div>
+            </template>
+
+            <br><br><br>
+        </template>
+    </template>
+
+    <div class="slds-align_absolute-center slds-m-vertical_large">
+        <lightning-button
+            variant="brand"
+            class="slds-var-m-left_x-small"
+            icon-name="action:refresh"
+            label="Refresh Contact List"
+            title="Sync the list with Salesforce"
+            onclick={handleRefreshFood}>
+        </lightning-button>
+    </div>
+
+    <br><br><br>
+
+    <template for:each={foodScannedContacts} for:item="contact">
+        <div key={contact.Id}>
+            <lightning-button
+                data-id={contact.Contact_ID__c}
+                variant="brand"
+                label={contact.Contact_Name__c}
+                title="View details of this contact"
+                disabled={isFoodPanelLocked}
+                onclick={handleSwitchContactFood}>
+            </lightning-button>
+        </div>
+    </template>
+
+    <br><br><br>
+
+    <div class="slds-align_absolute-center slds-m-vertical_large">
+        <lightning-button
+            variant="brand"
+            class="slds-var-m-left_x-small"
+            icon-name="action:reject"
+            label="Remove Current Contact from List"
+            title="Delete the Scanned Contact"
+            onclick={handleFoodPantryDeleteScan}>
+        </lightning-button>
+    </div>
+
+    <br><br><br>
+</template>
